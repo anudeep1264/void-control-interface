@@ -1,15 +1,29 @@
+import { Routes, Route } from "react-router-dom";
 import MatrixRain from "@/components/MatrixRain";
 import CyberSidebar from "@/components/CyberSidebar";
 import Dashboard from "@/components/Dashboard";
+import AIHub from "@/pages/AIHub";
+import History from "@/pages/History";
+import Subscriptions from "@/pages/Subscriptions";
+import Account from "@/pages/Account";
+import SecurityLogs from "@/pages/SecurityLogs";
+import SettingsPage from "@/pages/Settings";
 
 const Index = () => {
   return (
     <div className="flex h-screen overflow-hidden relative">
       <MatrixRain />
-      {/* Scanline overlay */}
       <div className="fixed inset-0 scanline pointer-events-none z-[1]" />
       <CyberSidebar />
-      <Dashboard />
+      <Routes>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/ai-hub" element={<AIHub />} />
+        <Route path="/history" element={<History />} />
+        <Route path="/subscriptions" element={<Subscriptions />} />
+        <Route path="/account" element={<Account />} />
+        <Route path="/security-logs" element={<SecurityLogs />} />
+        <Route path="/settings" element={<SettingsPage />} />
+      </Routes>
     </div>
   );
 };
