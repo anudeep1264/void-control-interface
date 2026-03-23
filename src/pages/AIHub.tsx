@@ -51,7 +51,15 @@ const AIHub = () => {
   };
 
   const createConversation = async () => {
-    if (!user) return null;
+    if (!user) {
+      // Guest mode: use local-only conversation
+      const guestId = crypto.randomUUID();
+      const guestConv: Conversation = { id: guestId, title: "New Conversation", created_at: new Date().toISOString() };
+      setConversations((prev) => [guestConv, ...prev]);
+      setActiveConvId(guestId);
+      setMessages([]);
+      return guestId;
+    }
     const { data, error } = await supabase
       .from("chat_conversations")
       .insert({ user_id: user.id, title: "New Conversation" })
@@ -65,13 +73,15 @@ const AIHub = () => {
   };
 
   const deleteConversation = async (convId: string) => {
-    await supabase.from("chat_conversations").delete().eq("id", convId);
+    if (user) {
+      await supabase.from("chat_conversations").delete().eq("id", convId);
+    }
     setConversations((prev) => prev.filter((c) => c.id !== convId));
     if (activeConvId === convId) { setActiveConvId(null); setMessages([]); }
   };
 
   const sendMessage = async () => {
-    if (!input.trim() || isLoading || !user) return;
+    if (!input.trim() || isLoading) return;
 
     let convId = activeConvId;
     if (!convId) {
@@ -85,18 +95,22 @@ const AIHub = () => {
     setInput("");
     setIsLoading(true);
 
-    // Save user message
-    await supabase.from("chat_messages").insert({
-      conversation_id: convId,
-      user_id: user.id,
-      role: "user",
-      content: userMsg.content,
-    });
+    // Save user message if authenticated
+    if (user) {
+      await supabase.from("chat_messages").insert({
+        conversation_id: convId,
+        user_id: user.id,
+        role: "user",
+        content: userMsg.content,
+      });
+    }
 
     // Update conversation title from first message
     if (messages.length === 0) {
       const title = userMsg.content.slice(0, 50) + (userMsg.content.length > 50 ? "..." : "");
-      await supabase.from("chat_conversations").update({ title }).eq("id", convId);
+      if (user) {
+        await supabase.from("chat_conversations").update({ title }).eq("id", convId);
+      }
       setConversations((prev) => prev.map((c) => c.id === convId ? { ...c, title } : c));
     }
 
@@ -118,7 +132,7 @@ const AIHub = () => {
         onDelta: upsertAssistant,
         onDone: async () => {
           setIsLoading(false);
-          if (assistantSoFar) {
+          if (assistantSoFar && user) {
             await supabase.from("chat_messages").insert({
               conversation_id: convId!,
               user_id: user.id,
