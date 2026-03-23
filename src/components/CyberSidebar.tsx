@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Home,
@@ -14,18 +15,19 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  { icon: Home, label: "Home", active: true },
-  { icon: Brain, label: "AI Hub", active: false },
-  { icon: Clock, label: "History", active: false },
-  { icon: CreditCard, label: "Subscriptions", active: false },
-  { icon: User, label: "Account", active: false },
-  { icon: ShieldCheck, label: "Security Logs", active: false },
-  { icon: Settings, label: "Settings", active: false },
+  { icon: Home, label: "Home", path: "/" },
+  { icon: Brain, label: "AI Hub", path: "/ai-hub" },
+  { icon: Clock, label: "History", path: "/history" },
+  { icon: CreditCard, label: "Subscriptions", path: "/subscriptions" },
+  { icon: User, label: "Account", path: "/account" },
+  { icon: ShieldCheck, label: "Security Logs", path: "/security-logs" },
+  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
 const CyberSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   return (
     <motion.aside
@@ -33,49 +35,35 @@ const CyberSidebar = () => {
       transition={{ duration: 0.3, ease: "easeInOut" }}
       className="relative flex flex-col h-screen bg-sidebar border-r border-sidebar-border z-10"
     >
-      {/* Glowing top edge */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-blue to-transparent opacity-60" />
 
-      {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border">
         <div className="relative flex items-center justify-center w-10 h-10 rounded-lg bg-muted glow-blue">
           <Zap className="w-5 h-5 text-primary" />
           <div className="absolute inset-0 rounded-lg animate-pulse-glow border border-primary/30" />
         </div>
         {!collapsed && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <h1 className="font-display text-lg font-bold text-primary text-glow-blue tracking-wider">
-              VLAD AI
-            </h1>
-            <p className="text-[10px] font-mono-tech text-muted-foreground tracking-widest">
-              CONTROL SYSTEM
-            </p>
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <h1 className="font-display text-lg font-bold text-primary text-glow-blue tracking-wider">VLAD AI</h1>
+            <p className="text-[10px] font-mono-tech text-muted-foreground tracking-widest">CONTROL SYSTEM</p>
           </motion.div>
         )}
       </div>
 
-      {/* Nav items */}
       <nav className="flex-1 py-4 px-2 space-y-1 overflow-y-auto">
-        {navItems.map((item, i) => {
-          const isActive = i === activeIndex;
+        {navItems.map((item) => {
+          const isActive = location.pathname === item.path;
           return (
             <motion.button
               key={item.label}
-              onClick={() => setActiveIndex(i)}
+              onClick={() => navigate(item.path)}
               whileHover={{ x: 4 }}
               whileTap={{ scale: 0.97 }}
-              className={`
-                relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                transition-all duration-200 group cursor-pointer
-                ${isActive
+              className={`relative w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group cursor-pointer ${
+                isActive
                   ? "bg-primary/10 border border-primary/30 glow-blue"
                   : "hover:bg-muted border border-transparent"
-                }
-              `}
+              }`}
             >
               {isActive && (
                 <motion.div
@@ -103,7 +91,6 @@ const CyberSidebar = () => {
         })}
       </nav>
 
-      {/* Status indicator */}
       <div className="px-3 pb-4">
         <div className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-muted border border-accent/20 ${collapsed ? "justify-center" : ""}`}>
           <span className="relative flex h-2.5 w-2.5">
@@ -111,14 +98,11 @@ const CyberSidebar = () => {
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent" />
           </span>
           {!collapsed && (
-            <span className="text-xs font-mono-tech text-accent text-glow-green tracking-wider">
-              MONITORING ON
-            </span>
+            <span className="text-xs font-mono-tech text-accent text-glow-green tracking-wider">MONITORING ON</span>
           )}
         </div>
       </div>
 
-      {/* Collapse toggle */}
       <button
         onClick={() => setCollapsed(!collapsed)}
         className="absolute -right-3 top-20 w-6 h-6 rounded-full bg-muted border border-border flex items-center justify-center hover:border-primary/50 transition-colors z-20"
