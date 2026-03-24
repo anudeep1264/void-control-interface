@@ -1,5 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { Routes, Route } from "react-router-dom";
 import MatrixRain from "@/components/MatrixRain";
 import CyberSidebar from "@/components/CyberSidebar";
 import Dashboard from "@/components/Dashboard";
@@ -11,20 +10,6 @@ import SecurityLogs from "@/pages/SecurityLogs";
 import SettingsPage from "@/pages/Settings";
 
 const Index = () => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="text-primary font-mono-tech text-sm animate-pulse tracking-widest">INITIALIZING...</div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    return <Navigate to="/auth" replace />;
-  }
-
   return (
     <div className="flex h-screen overflow-hidden relative">
       <MatrixRain />
