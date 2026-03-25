@@ -124,7 +124,7 @@ const Dashboard = () => {
         })}
       </div>
 
-      <div className="mb-8">
+      <div>
         <h3 className="font-display text-xs font-semibold text-muted-foreground tracking-[0.2em] mb-4 flex items-center gap-2">
           <Brain className="w-4 h-4 text-primary" /> ACTIVE AI MODULES
         </h3>
