@@ -39,6 +39,13 @@ const alertStyles = {
   info: "border-primary/20 text-primary",
 };
 
+const STATS = [
+  { label: "Active Modules", value: "6/6", icon: Cpu, color: "text-accent", bg: "bg-accent/10", border: "border-accent/30" },
+  { label: "Total Queries", value: "1.2M", icon: TrendingUp, color: "text-primary", bg: "bg-primary/10", border: "border-primary/30" },
+  { label: "Avg Latency", value: "42ms", icon: Activity, color: "text-secondary", bg: "bg-secondary/10", border: "border-secondary/30" },
+  { label: "Threat Level", value: "LOW", icon: Shield, color: "text-accent", bg: "bg-accent/10", border: "border-accent/30" },
+];
+
 const Dashboard = () => {
   const [diagRunning, setDiagRunning] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString("en-US", { hour12: false }));
@@ -69,44 +76,53 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-6 relative z-10">
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="font-display text-2xl font-bold text-primary text-glow-blue tracking-widest">COMMAND CENTER</h2>
-            <p className="text-sm font-mono-tech text-muted-foreground mt-1 tracking-wider">SYSTEM STATUS: ALL MODULES OPERATIONAL</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted border border-accent/20">
-              <Clock className="w-4 h-4 text-accent" />
-              <span className="text-xs font-mono-tech text-accent tracking-wider">{currentTime}</span>
-            </div>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={runDiagnostics}
-              disabled={diagRunning}
-              className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/30 text-primary font-display text-xs tracking-wider glow-blue hover:bg-primary/20 transition-all disabled:opacity-50"
-            >
-              {diagRunning ? "SCANNING..." : "RUN DIAGNOSTICS"}
-            </motion.button>
-          </div>
+    <div className="flex-1 overflow-y-auto p-6 relative z-10 space-y-5">
+      {/* Header */}
+      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Brain className="w-6 h-6 text-primary" />
+          <h2 className="font-display text-xl font-bold text-primary tracking-widest">COMMAND CENTER</h2>
         </div>
-
-        <div className="grid grid-cols-4 gap-4 mt-6">
-          {[
-            { label: "ACTIVE MODULES", value: "6/6", color: "text-accent text-glow-green" },
-            { label: "TOTAL QUERIES", value: "1.2M", color: "text-primary text-glow-blue" },
-            { label: "AVG LATENCY", value: "42ms", color: "text-secondary text-glow-purple" },
-            { label: "THREAT LEVEL", value: "LOW", color: "text-accent text-glow-green" },
-          ].map((stat, i) => (
-            <motion.div key={stat.label} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }} className="holo-card rounded-lg p-4 text-center">
-              <p className="text-[10px] font-mono-tech text-muted-foreground tracking-widest mb-1">{stat.label}</p>
-              <p className={`font-display text-xl font-bold ${stat.color}`}>{stat.value}</p>
-            </motion.div>
-          ))}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-muted border border-accent/20">
+            <Clock className="w-4 h-4 text-accent" />
+            <span className="text-xs font-mono-tech text-accent tracking-wider">{currentTime}</span>
+          </div>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={runDiagnostics}
+            disabled={diagRunning}
+            className="px-4 py-2 rounded-lg bg-primary/10 border border-primary/30 text-primary font-display text-xs tracking-wider hover:bg-primary/20 transition-all disabled:opacity-50"
+          >
+            {diagRunning ? "SCANNING..." : "RUN DIAGNOSTICS"}
+          </motion.button>
         </div>
       </motion.div>
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        {STATS.map((s, i) => {
+          const Icon = s.icon;
+          return (
+            <motion.div
+              key={s.label}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.07 }}
+              className={`holo-card rounded-xl p-4 border ${s.border} flex items-center gap-3`}
+            >
+              <div className={`p-2.5 rounded-lg ${s.bg}`}>
+                <Icon className={`w-5 h-5 ${s.color}`} />
+              </div>
+              <div>
+                <p className={`font-display text-2xl font-bold ${s.color}`}>{s.value}</p>
+                <p className="text-[11px] font-mono text-muted-foreground tracking-wider">{s.label}</p>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
 
       <div className="mb-8">
         <h3 className="font-display text-xs font-semibold text-muted-foreground tracking-[0.2em] mb-4 flex items-center gap-2">
