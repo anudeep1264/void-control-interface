@@ -149,31 +149,45 @@ const Dashboard = () => {
         </div>
       </div>
 
+      {/* Alerts */}
       <div>
         <h3 className="font-display text-xs font-semibold text-muted-foreground tracking-[0.2em] mb-4 flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-neon-pink" /> REAL-TIME ALERTS
         </h3>
-        <div className="space-y-2">
-          {alerts.length === 0 && (
-            <div className="holo-card rounded-lg p-4 text-center">
-              <p className="text-sm font-mono-tech text-muted-foreground">No active alerts</p>
-            </div>
-          )}
-          {alerts.map((alert, i) => {
-            const style = alertStyles[alert.type as keyof typeof alertStyles];
-            return (
-              <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 + i * 0.1 }} className={`holo-card rounded-lg p-3 flex items-center gap-3 border ${style.split(" ")[0]}`}>
-                <alert.icon className={`w-4 h-4 shrink-0 ${style.split(" ")[1]}`} />
-                <span className="text-sm font-body text-foreground flex-1">{alert.message}</span>
-                <span className="text-[10px] font-mono-tech text-muted-foreground tracking-wider whitespace-nowrap">{alert.time}</span>
-                <button onClick={() => dismissAlert(i)} className="p-1 rounded hover:bg-muted transition-colors">
-                  <X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
-                </button>
-              </motion.div>
-            );
-          })}
-        </div>
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="holo-card rounded-xl border border-border overflow-hidden">
+          <div className="space-y-0">
+            {alerts.length === 0 && (
+              <div className="p-6 text-center">
+                <p className="text-sm font-mono text-muted-foreground">No active alerts</p>
+              </div>
+            )}
+            {alerts.map((alert, i) => {
+              const style = alertStyles[alert.type as keyof typeof alertStyles];
+              return (
+                <motion.div key={i} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.5 + i * 0.03 }} className={`p-3 flex items-center gap-3 border-b border-border/50 last:border-b-0 hover:bg-muted/30 transition-colors`}>
+                  <alert.icon className={`w-4 h-4 shrink-0 ${style.split(" ")[1]}`} />
+                  <span className="text-xs font-body text-foreground flex-1">{alert.message}</span>
+                  <span className="text-[10px] font-mono text-muted-foreground tracking-wider whitespace-nowrap">{alert.time}</span>
+                  <button onClick={() => dismissAlert(i)} className="p-1 rounded hover:bg-muted transition-colors">
+                    <X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+                  </button>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
       </div>
+
+      {/* Status Bar */}
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="flex items-center gap-2 px-1">
+        <span className="relative flex h-2.5 w-2.5">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-accent" />
+        </span>
+        <span className="text-[11px] font-mono text-accent tracking-wider">
+          All Systems Operational — Uptime: 99.99% — Auto-refresh: ON
+        </span>
+      </motion.div>
     </div>
   );
 };
