@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   Brain,
@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   Clock,
   TrendingUp,
+  X,
 } from "lucide-react";
 import HoloCard from "./HoloCard";
 import { toast } from "@/hooks/use-toast";
@@ -24,7 +25,7 @@ const aiModules = [
   { title: "ANOMALY DETECTOR", subtitle: "v3.3.7 • Real-time", icon: Activity, status: "online" as const, glow: "purple" as const, metric: "340ms", metricLabel: "avg response" },
 ];
 
-const alerts = [
+const initialAlerts = [
   { type: "success", icon: CheckCircle2, message: "System integrity verified", time: "2 min ago" },
   { type: "warning", icon: AlertTriangle, message: "Unusual traffic spike detected on port 8443", time: "8 min ago" },
   { type: "success", icon: CheckCircle2, message: "Neural Engine model updated successfully", time: "15 min ago" },
@@ -41,12 +42,12 @@ const alertStyles = {
 const Dashboard = () => {
   const [diagRunning, setDiagRunning] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date().toLocaleTimeString("en-US", { hour12: false }));
+  const [alerts, setAlerts] = useState(initialAlerts);
 
-  // Update clock every second
-  useState(() => {
+  useEffect(() => {
     const interval = setInterval(() => setCurrentTime(new Date().toLocaleTimeString("en-US", { hour12: false })), 1000);
     return () => clearInterval(interval);
-  });
+  }, []);
 
   const runDiagnostics = () => {
     if (diagRunning) return;
@@ -55,7 +56,16 @@ const Dashboard = () => {
     setTimeout(() => {
       setDiagRunning(false);
       toast({ title: "DIAGNOSTICS COMPLETE", description: "All 6 modules operational. No anomalies detected." });
+      setAlerts(prev => [
+        { type: "success", icon: CheckCircle2, message: "Full diagnostics scan completed — all clear", time: "Just now" },
+        ...prev,
+      ]);
     }, 3000);
+  };
+
+  const dismissAlert = (index: number) => {
+    setAlerts(prev => prev.filter((_, i) => i !== index));
+    toast({ title: "ALERT DISMISSED", description: "Alert removed from feed." });
   };
 
   return (
@@ -128,6 +138,11 @@ const Dashboard = () => {
           <AlertTriangle className="w-4 h-4 text-neon-pink" /> REAL-TIME ALERTS
         </h3>
         <div className="space-y-2">
+          {alerts.length === 0 && (
+            <div className="holo-card rounded-lg p-4 text-center">
+              <p className="text-sm font-mono-tech text-muted-foreground">No active alerts</p>
+            </div>
+          )}
           {alerts.map((alert, i) => {
             const style = alertStyles[alert.type as keyof typeof alertStyles];
             return (
@@ -135,6 +150,9 @@ const Dashboard = () => {
                 <alert.icon className={`w-4 h-4 shrink-0 ${style.split(" ")[1]}`} />
                 <span className="text-sm font-body text-foreground flex-1">{alert.message}</span>
                 <span className="text-[10px] font-mono-tech text-muted-foreground tracking-wider whitespace-nowrap">{alert.time}</span>
+                <button onClick={() => dismissAlert(i)} className="p-1 rounded hover:bg-muted transition-colors">
+                  <X className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+                </button>
               </motion.div>
             );
           })}

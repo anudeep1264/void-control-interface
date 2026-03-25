@@ -11,6 +11,9 @@ const Account = () => {
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    // Load from localStorage for guest mode
+    const saved = localStorage.getItem("vlad_display_name");
+    if (saved) setDisplayName(saved);
     if (user) loadProfile();
   }, [user]);
 
@@ -20,15 +23,29 @@ const Account = () => {
   };
 
   const saveProfile = async () => {
-    if (!user) return;
     setSaving(true);
-    const { error } = await supabase
-      .from("profiles")
-      .update({ display_name: displayName })
-      .eq("user_id", user.id);
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
-    else toast({ title: "PROFILE UPDATED", description: "Changes saved successfully." });
+    localStorage.setItem("vlad_display_name", displayName);
+
+    if (user) {
+      const { error } = await supabase
+        .from("profiles")
+        .update({ display_name: displayName })
+        .eq("user_id", user.id);
+      if (error) {
+        toast({ title: "Error", description: error.message, variant: "destructive" });
+        setSaving(false);
+        return;
+      }
+    }
+    toast({ title: "PROFILE UPDATED", description: "Changes saved successfully." });
     setSaving(false);
+  };
+
+  const handleSignOut = async () => {
+    if (user) {
+      await signOut();
+    }
+    toast({ title: "SESSION TERMINATED", description: "You have been logged out." });
   };
 
   return (
@@ -49,6 +66,7 @@ const Account = () => {
               <input
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value)}
+                placeholder="Enter your name..."
                 className="w-full px-4 py-3 bg-muted border border-border rounded-lg text-foreground font-mono-tech text-sm focus:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
               />
             </div>
@@ -56,7 +74,7 @@ const Account = () => {
               <label className="text-xs font-mono-tech text-muted-foreground tracking-wider mb-1 block">EMAIL</label>
               <div className="flex items-center gap-2 px-4 py-3 bg-muted/50 border border-border rounded-lg">
                 <Mail className="w-4 h-4 text-muted-foreground" />
-                <span className="text-sm font-mono-tech text-foreground">{user?.email}</span>
+                <span className="text-sm font-mono-tech text-foreground">{user?.email || "Guest Operator"}</span>
               </div>
             </div>
             <div>
@@ -64,7 +82,7 @@ const Account = () => {
               <div className="flex items-center gap-2 px-4 py-3 bg-muted/50 border border-border rounded-lg">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <span className="text-sm font-mono-tech text-foreground">
-                  {user?.created_at ? new Date(user.created_at).toLocaleDateString() : "N/A"}
+                  {user?.created_at ? new Date(user.created_at).toLocaleDateString() : new Date().toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -86,7 +104,7 @@ const Account = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={signOut}
+            onClick={handleSignOut}
             className="w-full py-2.5 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive font-display text-xs tracking-widest hover:bg-destructive/20 transition-all"
           >
             TERMINATE SESSION

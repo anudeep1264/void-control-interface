@@ -20,24 +20,31 @@ const settingsConfig: SettingItem[] = [
   { key: "theme_accent", label: "Primary Accent", type: "select", options: ["blue", "green", "purple", "cyan", "pink"] },
 ];
 
+const defaultSettings: Record<string, string> = {
+  matrix_rain: "true",
+  scanlines: "true",
+  sound_effects: "false",
+  notification_level: "all",
+  theme_accent: "blue",
+};
+
 const SettingsPage = () => {
   const { user } = useAuth();
-  const [settings, setSettings] = useState<Record<string, string>>({
-    matrix_rain: "true",
-    scanlines: "true",
-    sound_effects: "false",
-    notification_level: "all",
-    theme_accent: "blue",
-  });
+  const [settings, setSettings] = useState<Record<string, string>>({ ...defaultSettings });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
+    // Load from localStorage for guest, or DB for authenticated
+    const saved = localStorage.getItem("vlad_settings");
+    if (saved) {
+      try { setSettings(prev => ({ ...prev, ...JSON.parse(saved) })); } catch {}
+    }
     if (user) loadSettings();
   }, [user]);
 
   const loadSettings = async () => {
     const { data } = await supabase.from("user_settings").select("*").eq("user_id", user!.id);
-    if (data) {
+    if (data && data.length > 0) {
       const map: Record<string, string> = {};
       data.forEach((s) => { map[s.setting_key] = s.setting_value || ""; });
       setSettings((prev) => ({ ...prev, ...map }));
@@ -45,24 +52,24 @@ const SettingsPage = () => {
   };
 
   const saveSetting = async (key: string, value: string) => {
-    if (!user) return;
-    setSettings((prev) => ({ ...prev, [key]: value }));
-    const { error } = await supabase
-      .from("user_settings")
-      .upsert({ user_id: user.id, setting_key: key, setting_value: value }, { onConflict: "user_id,setting_key" });
-    if (error) toast({ title: "Error", description: error.message, variant: "destructive" });
+    const updated = { ...settings, [key]: value };
+    setSettings(updated);
+    localStorage.setItem("vlad_settings", JSON.stringify(updated));
+    toast({ title: "SETTING UPDATED", description: `${key.replace(/_/g, " ").toUpperCase()} changed.` });
+
+    if (user) {
+      await supabase
+        .from("user_settings")
+        .upsert({ user_id: user.id, setting_key: key, setting_value: value }, { onConflict: "user_id,setting_key" });
+    }
   };
 
-  const resetAll = async () => {
-    if (!user) return;
-    await supabase.from("user_settings").delete().eq("user_id", user.id);
-    setSettings({
-      matrix_rain: "true",
-      scanlines: "true",
-      sound_effects: "false",
-      notification_level: "all",
-      theme_accent: "blue",
-    });
+  const resetAll = () => {
+    setSettings({ ...defaultSettings });
+    localStorage.setItem("vlad_settings", JSON.stringify(defaultSettings));
+    if (user) {
+      supabase.from("user_settings").delete().eq("user_id", user.id);
+    }
     toast({ title: "SETTINGS RESET", description: "All settings restored to defaults." });
   };
 
