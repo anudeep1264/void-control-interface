@@ -2,13 +2,17 @@ export type Msg = { role: "user" | "assistant"; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
+export type AiMode = "creative" | "developer" | "automation" | "security" | "research";
+
 export async function streamChat({
   messages,
+  mode,
   onDelta,
   onDone,
   onError,
 }: {
   messages: Msg[];
+  mode?: AiMode;
   onDelta: (deltaText: string) => void;
   onDone: () => void;
   onError?: (error: string) => void;
@@ -19,7 +23,7 @@ export async function streamChat({
       "Content-Type": "application/json",
       Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
     },
-    body: JSON.stringify({ messages }),
+    body: JSON.stringify({ messages, mode: mode || "creative" }),
   });
 
   if (!resp.ok) {
