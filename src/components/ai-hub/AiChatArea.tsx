@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Send, Brain } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Send, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { streamChat, type Msg, type AiMode } from "@/lib/streamChat";
@@ -8,17 +8,29 @@ import { toast } from "@/hooks/use-toast";
 import ReactMarkdown from "react-markdown";
 import { useConversationStore } from "./AiConversationSidebar";
 import { MODE_CONFIG } from "./modeConfig";
+import { AiSmartSuggestions } from "./AiSmartSuggestions";
+import { AiThinkingIndicator } from "./AiThinkingIndicator";
 
 interface Props {
   mode: AiMode;
+  onProcessingChange?: (v: boolean) => void;
 }
 
-export const AiChatArea = ({ mode }: Props) => {
+const DEMO_SCRIPTS: Record<AiMode, string[]> = {
+  creative: ["Write me a short cyberpunk poem about artificial intelligence"],
+  developer: ["Write a TypeScript function that debounces async calls with cancellation support"],
+  automation: ["Create a 5-step CI/CD pipeline for a Node.js project with testing and deployment"],
+  security: ["Perform a threat analysis on a web application exposed to the public internet"],
+  research: ["Compare React, Vue, and Svelte frameworks in terms of performance and developer experience"],
+};
+
+export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
   const { user } = useAuth();
   const store = useConversationStore();
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasStartedStreaming, setHasStartedStreaming] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const prevConvIdRef = useRef<string | null>(null);
   const cfg = MODE_CONFIG[mode];
@@ -27,7 +39,6 @@ export const AiChatArea = ({ mode }: Props) => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Load messages when conversation changes
   useEffect(() => {
     if (store.activeConvId && store.activeConvId !== prevConvIdRef.current) {
       prevConvIdRef.current = store.activeConvId;
@@ -62,16 +73,19 @@ export const AiChatArea = ({ mode }: Props) => {
     return data.id;
   };
 
-  const sendMessage = async () => {
-    if (!input.trim() || isLoading) return;
+  const sendMessage = async (overrideInput?: string) => {
+    const text = overrideInput ?? input;
+    if (!text.trim() || isLoading) return;
     const convId = await ensureConversation();
     if (!convId) return;
 
-    const userMsg: Msg = { role: "user", content: input.trim() };
+    const userMsg: Msg = { role: "user", content: text.trim() };
     const allMessages = [...messages, userMsg];
     setMessages(allMessages);
     setInput("");
     setIsLoading(true);
+    setHasStartedStreaming(false);
+    onProcessingChange?.(true);
 
     if (user) {
       await supabase.from("chat_messages").insert({ conversation_id: convId, user_id: user.id, role: "user", content: userMsg.content });
@@ -85,6 +99,7 @@ export const AiChatArea = ({ mode }: Props) => {
 
     let assistantSoFar = "";
     const upsertAssistant = (chunk: string) => {
+      if (!hasStartedStreaming) setHasStartedStreaming(true);
       assistantSoFar += chunk;
       setMessages((prev) => {
         const last = prev[prev.length - 1];
@@ -100,26 +115,43 @@ export const AiChatArea = ({ mode }: Props) => {
         onDelta: upsertAssistant,
         onDone: async () => {
           setIsLoading(false);
+          setHasStartedStreaming(false);
+          onProcessingChange?.(false);
           if (assistantSoFar && user) {
             await supabase.from("chat_messages").insert({ conversation_id: convId, user_id: user.id, role: "assistant", content: assistantSoFar });
           }
         },
-        onError: (err) => { toast({ title: "AI ERROR", description: err, variant: "destructive" }); setIsLoading(false); },
+        onError: (err) => { toast({ title: "AI ERROR", description: err, variant: "destructive" }); setIsLoading(false); onProcessingChange?.(false); },
       });
-    } catch { setIsLoading(false); }
+    } catch { setIsLoading(false); onProcessingChange?.(false); }
+  };
+
+  const runDemo = () => {
+    const script = DEMO_SCRIPTS[mode][0];
+    sendMessage(script);
   };
 
   const ModeIcon = cfg.icon;
+  const showSuggestions = messages.length === 0 && !isLoading;
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 && (
+        {messages.length === 0 && !isLoading && (
           <div className="flex-1 flex items-center justify-center h-full">
-            <div className="text-center">
+            <div className="text-center space-y-4">
               <ModeIcon className={`w-16 h-16 mx-auto mb-4 opacity-20 ${cfg.textColor}`} />
               <h3 className={`font-display text-lg tracking-widest opacity-40 ${cfg.textColor}`}>{cfg.label}</h3>
               <p className="text-xs font-mono-tech text-muted-foreground mt-2">{cfg.subtitle}</p>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={runDemo}
+                className={`mx-auto mt-4 flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono-tech tracking-wider border ${cfg.borderActive} ${cfg.bgActive} ${cfg.textColor} hover:opacity-80 transition-all`}
+              >
+                <Play className="w-3 h-3" />
+                RUN DEMO
+              </motion.button>
             </div>
           </div>
         )}
@@ -136,15 +168,15 @@ export const AiChatArea = ({ mode }: Props) => {
             </div>
           </motion.div>
         ))}
-        {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
-          <div className="flex justify-start">
-            <div className="holo-card rounded-xl px-4 py-3 border border-secondary/20">
-              <span className={`text-xs font-mono-tech animate-pulse ${cfg.textColor}`}>PROCESSING...</span>
-            </div>
-          </div>
-        )}
+        <AnimatePresence>
+          {isLoading && messages[messages.length - 1]?.role !== "assistant" && (
+            <AiThinkingIndicator mode={mode} isThinking={true} hasStartedStreaming={hasStartedStreaming} />
+          )}
+        </AnimatePresence>
         <div ref={messagesEndRef} />
       </div>
+
+      <AiSmartSuggestions mode={mode} onSelect={(s) => sendMessage(s)} visible={showSuggestions} />
 
       <div className="p-4 border-t border-border">
         <div className="flex gap-2">
@@ -159,7 +191,7 @@ export const AiChatArea = ({ mode }: Props) => {
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            onClick={sendMessage}
+            onClick={() => sendMessage()}
             disabled={isLoading || !input.trim()}
             className="px-4 py-3 rounded-lg bg-primary/20 border border-primary/30 text-primary glow-blue hover:bg-primary/30 transition-all disabled:opacity-50"
           >

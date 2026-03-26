@@ -5,10 +5,12 @@ import { type AiMode } from "@/lib/streamChat";
 import { AiModeSwitcher } from "@/components/ai-hub/AiModeSwitcher";
 import { AiConversationSidebar } from "@/components/ai-hub/AiConversationSidebar";
 import { AiChatArea } from "@/components/ai-hub/AiChatArea";
+import { AiSystemStatus } from "@/components/ai-hub/AiSystemStatus";
 import { MODE_CONFIG } from "@/components/ai-hub/modeConfig";
 
 const AIHub = () => {
   const [mode, setMode] = useState<AiMode>("creative");
+  const [isProcessing, setIsProcessing] = useState(false);
   const cfg = MODE_CONFIG[mode];
 
   return (
@@ -41,8 +43,11 @@ const AIHub = () => {
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden">
         <AiConversationSidebar />
-        <AiChatArea mode={mode} />
+        <AiChatArea mode={mode} onProcessingChange={setIsProcessing} />
       </div>
+
+      {/* System status panel */}
+      <AiSystemStatus mode={mode} isProcessing={isProcessing} />
     </div>
   );
 };
