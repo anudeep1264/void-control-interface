@@ -6,8 +6,8 @@ interface AuthContextType {
   user: User | null;
   session: Session | null;
   loading: boolean;
-  signUp: (email: string, password: string, displayName?: string) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  signInWithOtp: (email: string) => Promise<void>;
+  verifyOtp: (email: string, token: string) => Promise<void>;
   signOut: () => Promise<void>;
 }
 
@@ -34,20 +34,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, displayName?: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        emailRedirectTo: window.location.origin,
-        data: { display_name: displayName },
-      },
-    });
+  const signInWithOtp = async (email: string) => {
+    const { error } = await supabase.auth.signInWithOtp({ email });
     if (error) throw error;
   };
 
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const verifyOtp = async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({ email, token, type: "email" });
     if (error) throw error;
   };
 
@@ -57,7 +50,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signUp, signIn, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signInWithOtp, verifyOtp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
@@ -66,13 +59,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const ctx = useContext(AuthContext);
   if (!ctx) {
-    // Guest mode fallback when AuthProvider is not mounted
     return {
       user: null,
       session: null,
       loading: false,
-      signUp: async () => {},
-      signIn: async () => {},
+      signInWithOtp: async () => {},
+      verifyOtp: async () => {},
       signOut: async () => {},
     } as AuthContextType;
   }
