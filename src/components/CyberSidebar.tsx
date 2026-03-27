@@ -99,7 +99,20 @@ const CyberSidebar = () => {
         })}
       </nav>
 
-      <div className="px-3 pb-4">
+      <div className="px-3 pb-4 space-y-2">
+        <motion.button
+          onClick={handleLogout}
+          whileHover={{ x: 4 }}
+          whileTap={{ scale: 0.97 }}
+          className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-destructive/10 border border-transparent hover:border-destructive/30 transition-all group cursor-pointer ${collapsed ? "justify-center" : ""}`}
+        >
+          <LogOut className="w-5 h-5 shrink-0 text-muted-foreground group-hover:text-destructive transition-colors" />
+          {!collapsed && (
+            <span className="text-sm font-medium tracking-wide text-muted-foreground group-hover:text-destructive transition-colors">
+              Logout
+            </span>
+          )}
+        </motion.button>
         <div className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-muted border border-accent/20 ${collapsed ? "justify-center" : ""}`}>
           <span className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
