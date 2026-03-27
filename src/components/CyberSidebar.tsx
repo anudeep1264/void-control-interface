@@ -12,7 +12,9 @@ import {
   ChevronLeft,
   ChevronRight,
   Zap,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { icon: Home, label: "Home", path: "/" },
