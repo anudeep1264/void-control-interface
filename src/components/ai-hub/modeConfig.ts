@@ -73,7 +73,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   decision: {
     label: "DECISION MODE",
     subtitle: "Recommendations & Option Analysis",
-    brain: "Strategist Brain",
+    brain: "Watson Brain",
     icon: Scale,
     textColor: "text-[hsl(var(--neon-cyan))]",
     dotColor: "bg-[hsl(var(--neon-cyan))]",
@@ -84,7 +84,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   analytics: {
     label: "ANALYTICS MODE",
     subtitle: "Data Insights & Visualization",
-    brain: "Analyst Brain",
+    brain: "Tableau + Power BI Brain",
     icon: BarChart3,
     textColor: "text-[hsl(var(--neon-green))]",
     dotColor: "bg-[hsl(var(--neon-green))]",
@@ -95,7 +95,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   problemsolving: {
     label: "PROBLEM SOLVING",
     subtitle: "Step-by-Step Logical Reasoning",
-    brain: "Logic Brain",
+    brain: "Wolfram + GPT Brain",
     icon: Lightbulb,
     textColor: "text-[hsl(var(--neon-purple))]",
     dotColor: "bg-[hsl(var(--neon-purple))]",
@@ -106,7 +106,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   learning: {
     label: "LEARNING MODE",
     subtitle: "Concept Explanation & Quizzes",
-    brain: "Tutor Brain",
+    brain: "Khan Academy Brain",
     icon: GraduationCap,
     textColor: "text-[hsl(var(--neon-pink))]",
     dotColor: "bg-[hsl(var(--neon-pink))]",
@@ -117,7 +117,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   communication: {
     label: "COMMS MODE",
     subtitle: "Emails & Professional Content",
-    brain: "Writer Brain",
+    brain: "Grammarly Brain",
     icon: Mail,
     textColor: "text-[hsl(var(--neon-cyan))]",
     dotColor: "bg-[hsl(var(--neon-cyan))]",
@@ -128,7 +128,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   strategy: {
     label: "STRATEGY MODE",
     subtitle: "Planning & Optimization",
-    brain: "Planner Brain",
+    brain: "Palantir Brain",
     icon: Target,
     textColor: "text-[hsl(var(--neon-green))]",
     dotColor: "bg-[hsl(var(--neon-green))]",
@@ -139,7 +139,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   debug: {
     label: "DEBUG MODE",
     subtitle: "Error Detection & Fixes",
-    brain: "Debugger Brain",
+    brain: "Copilot Debugger Brain",
     icon: Bug,
     textColor: "text-destructive",
     dotColor: "bg-destructive",
@@ -150,7 +150,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   simulation: {
     label: "SIMULATION MODE",
     subtitle: "Real-World Scenario Testing",
-    brain: "Simulator Brain",
+    brain: "MATLAB Simulator Brain",
     icon: FlaskConical,
     textColor: "text-[hsl(var(--neon-purple))]",
     dotColor: "bg-[hsl(var(--neon-purple))]",
