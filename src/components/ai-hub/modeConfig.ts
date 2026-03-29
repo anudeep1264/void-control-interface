@@ -5,6 +5,7 @@ import { type LucideIcon } from "lucide-react";
 interface ModeInfo {
   label: string;
   subtitle: string;
+  brain: string;
   icon: LucideIcon;
   textColor: string;
   dotColor: string;
