@@ -9,6 +9,14 @@ const THINKING_PHRASES: Record<AiMode, string[]> = {
   automation: ["Building workflow…", "Orchestrating steps…", "Mapping pipeline…", "Configuring tasks…"],
   security: ["Scanning threats…", "Analyzing patterns…", "Checking signatures…", "Evaluating risk…"],
   research: ["Researching data…", "Cross-referencing…", "Synthesizing info…", "Analyzing sources…"],
+  decision: ["Weighing options…", "Evaluating criteria…", "Scoring alternatives…", "Building matrix…"],
+  analytics: ["Processing data…", "Detecting trends…", "Computing metrics…", "Generating insights…"],
+  problemsolving: ["Decomposing problem…", "Tracing logic…", "Testing hypotheses…", "Verifying solution…"],
+  learning: ["Preparing lesson…", "Building examples…", "Crafting quiz…", "Adapting content…"],
+  communication: ["Drafting content…", "Polishing tone…", "Structuring message…", "Refining copy…"],
+  strategy: ["Analyzing landscape…", "Mapping objectives…", "Building roadmap…", "Optimizing plan…"],
+  debug: ["Scanning for errors…", "Tracing stack…", "Isolating bug…", "Preparing fix…"],
+  simulation: ["Initializing scenario…", "Running simulation…", "Modeling response…", "Compiling results…"],
 };
 
 interface Props {
