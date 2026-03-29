@@ -7,7 +7,7 @@ interface Props {
   onModeChange: (mode: AiMode) => void;
 }
 
-const MODES: AiMode[] = ["creative", "developer", "automation", "security", "research"];
+const MODES: AiMode[] = ["creative", "developer", "automation", "security", "research", "decision", "analytics", "problemsolving", "learning", "communication", "strategy", "debug", "simulation"];
 
 export const AiModeSwitcher = ({ activeMode, onModeChange }: Props) => (
   <div className="flex gap-1 px-4 pb-3 overflow-x-auto">

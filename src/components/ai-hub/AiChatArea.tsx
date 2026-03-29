@@ -22,6 +22,14 @@ const DEMO_SCRIPTS: Record<AiMode, string[]> = {
   automation: ["Create a 5-step CI/CD pipeline for a Node.js project with testing and deployment"],
   security: ["Perform a threat analysis on a web application exposed to the public internet"],
   research: ["Compare React, Vue, and Svelte frameworks in terms of performance and developer experience"],
+  decision: ["Help me decide between AWS, GCP, and Azure for a startup's cloud infrastructure"],
+  analytics: ["Analyze this hypothetical e-commerce dataset and identify the top 3 growth opportunities"],
+  problemsolving: ["Walk me through solving the traveling salesman problem step by step"],
+  learning: ["Teach me about neural networks and then quiz me on the key concepts"],
+  communication: ["Draft a professional email to a client explaining a project delay"],
+  strategy: ["Create a 90-day go-to-market strategy for a new SaaS product"],
+  debug: ["Debug this error: TypeError: Cannot read properties of undefined (reading 'map')"],
+  simulation: ["Simulate a DDoS attack on a web server and show the defense response"],
 };
 
 export const AiChatArea = ({ mode, onProcessingChange }: Props) => {

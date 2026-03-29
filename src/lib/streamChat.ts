@@ -2,7 +2,7 @@ export type Msg = { role: "user" | "assistant"; content: string };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat`;
 
-export type AiMode = "creative" | "developer" | "automation" | "security" | "research";
+export type AiMode = "creative" | "developer" | "automation" | "security" | "research" | "decision" | "analytics" | "problemsolving" | "learning" | "communication" | "strategy" | "debug" | "simulation";
 
 export async function streamChat({
   messages,
