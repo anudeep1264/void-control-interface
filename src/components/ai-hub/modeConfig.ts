@@ -18,6 +18,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   creative: {
     label: "CREATIVE MODE",
     subtitle: "Content Generation & Ideation",
+    brain: "Gemini Brain",
     icon: Palette,
     textColor: "text-[hsl(var(--neon-pink))]",
     dotColor: "bg-[hsl(var(--neon-pink))]",
@@ -28,6 +29,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   developer: {
     label: "DEVELOPER MODE",
     subtitle: "Code & Technical Solutions",
+    brain: "Copilot Brain",
     icon: Code2,
     textColor: "text-[hsl(var(--neon-cyan))]",
     dotColor: "bg-[hsl(var(--neon-cyan))]",
@@ -38,6 +40,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   automation: {
     label: "AUTOMATION MODE",
     subtitle: "Workflow Orchestration",
+    brain: "Orchestrator Brain",
     icon: Workflow,
     textColor: "text-[hsl(var(--neon-purple))]",
     dotColor: "bg-[hsl(var(--neon-purple))]",
@@ -48,6 +51,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   security: {
     label: "SECURITY MODE",
     subtitle: "Threat Analysis & Defense",
+    brain: "Defense Brain",
     icon: ShieldAlert,
     textColor: "text-destructive",
     dotColor: "bg-destructive",
@@ -58,6 +62,7 @@ export const MODE_CONFIG: Record<AiMode, ModeInfo> = {
   research: {
     label: "RESEARCH MODE",
     subtitle: "Analysis & Documentation",
+    brain: "Perplexity Brain",
     icon: BookOpen,
     textColor: "text-[hsl(var(--neon-green))]",
     dotColor: "bg-[hsl(var(--neon-green))]",
