@@ -80,7 +80,7 @@ serve(async (req) => {
       body: JSON.stringify({
         model: config.model,
         messages: [
-          { role: "system", content: config.system },
+          { role: "system", content: contextPrefix + config.system },
           ...messages,
         ],
         stream: true,
