@@ -69,6 +69,7 @@ serve(async (req) => {
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const config = MODE_CONFIG[mode] || MODE_CONFIG.creative;
+    const contextPrefix = "You have continuous memory of this conversation. Reference previous messages to provide personalized, context-aware responses. Build on past interactions naturally. ";
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
