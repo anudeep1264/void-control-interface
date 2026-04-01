@@ -10,7 +10,7 @@ interface Props {
 const MODES: AiMode[] = ["creative", "developer", "automation", "security", "research", "decision", "analytics", "problemsolving", "learning", "communication", "strategy", "debug", "simulation"];
 
 export const AiModeSwitcher = ({ activeMode, onModeChange }: Props) => (
-  <div className="flex gap-1 px-4 pb-3 overflow-x-auto">
+  <div className="flex gap-1 px-3 sm:px-4 pb-2 sm:pb-3 overflow-x-auto scrollbar-hide">
     {MODES.map((m) => {
       const cfg = MODE_CONFIG[m];
       const Icon = cfg.icon;
@@ -21,14 +21,14 @@ export const AiModeSwitcher = ({ activeMode, onModeChange }: Props) => (
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
           onClick={() => onModeChange(m)}
-          className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono-tech tracking-widest border transition-all whitespace-nowrap ${
+          className={`relative flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-1.5 rounded-lg text-[9px] sm:text-[10px] font-mono-tech tracking-widest border transition-all whitespace-nowrap shrink-0 ${
             active
               ? `${cfg.bgActive} ${cfg.borderActive} ${cfg.textColor}`
               : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted"
           }`}
         >
           <Icon className="w-3 h-3" />
-          {cfg.label}
+          <span className="hidden xs:inline sm:inline">{cfg.label}</span>
           {active && (
             <motion.div
               layoutId="mode-glow"

@@ -33,7 +33,7 @@ export const AiSmartSuggestions = ({ mode, onSelect, visible }: Props) => {
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 8 }}
-      className="flex flex-wrap gap-2 px-4 pb-2"
+      className="flex flex-wrap gap-1.5 sm:gap-2 px-3 sm:px-4 pb-2"
     >
       {items.map((s) => (
         <motion.button
@@ -41,10 +41,10 @@ export const AiSmartSuggestions = ({ mode, onSelect, visible }: Props) => {
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           onClick={() => onSelect(s)}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-mono-tech tracking-wider border border-border bg-muted/50 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-all"
+          className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-lg text-[9px] sm:text-[10px] font-mono-tech tracking-wider border border-border bg-muted/50 text-muted-foreground hover:text-foreground hover:border-primary/40 hover:bg-primary/5 transition-all"
         >
-          <Zap className="w-2.5 h-2.5" />
-          {s}
+          <Zap className="w-2.5 h-2.5 shrink-0" />
+          <span className="truncate">{s}</span>
         </motion.button>
       ))}
     </motion.div>
