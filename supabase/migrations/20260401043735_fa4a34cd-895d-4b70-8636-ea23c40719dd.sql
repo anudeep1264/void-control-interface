@@ -1,0 +1,1 @@
+ALTER TABLE public.chat_conversations ADD COLUMN mode text NOT NULL DEFAULT 'creative';

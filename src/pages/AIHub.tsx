@@ -42,7 +42,7 @@ const AIHub = () => {
 
       {/* Main content */}
       <div className="flex-1 flex overflow-hidden">
-        <AiConversationSidebar />
+        <AiConversationSidebar mode={mode} />
         <AiChatArea mode={mode} onProcessingChange={setIsProcessing} />
       </div>
 
