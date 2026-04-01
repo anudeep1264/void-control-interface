@@ -4,16 +4,17 @@ import { Plus, MessageSquare, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
+import { type AiMode } from "@/lib/streamChat";
 
 export interface Conversation {
   id: string;
   title: string;
   created_at: string;
+  mode?: string;
 }
 
 // Shared state so chat area can read active conversation
 let _activeConvId: string | null = null;
-let _setActiveConvId: ((id: string | null) => void) | null = null;
 let _conversations: Conversation[] = [];
 let _listeners: (() => void)[] = [];
 
@@ -38,18 +39,29 @@ export function useConversationStore() {
   };
 }
 
-export const AiConversationSidebar = () => {
+interface SidebarProps {
+  mode: AiMode;
+}
+
+export const AiConversationSidebar = ({ mode }: SidebarProps) => {
   const { user } = useAuth();
   const store = useConversationStore();
 
   useEffect(() => {
     if (user) loadConversations();
-  }, [user]);
+    else store.setConversations([]);
+  }, [user, mode]);
+
+  // Reset active conversation when mode changes
+  useEffect(() => {
+    store.setActiveConvId(null);
+  }, [mode]);
 
   const loadConversations = async () => {
     const { data } = await supabase
       .from("chat_conversations")
       .select("*")
+      .eq("mode", mode)
       .order("updated_at", { ascending: false });
     if (data) store.setConversations(data);
   };
@@ -57,14 +69,14 @@ export const AiConversationSidebar = () => {
   const createConversation = async () => {
     if (!user) {
       const guestId = crypto.randomUUID();
-      const guestConv: Conversation = { id: guestId, title: "New Conversation", created_at: new Date().toISOString() };
+      const guestConv: Conversation = { id: guestId, title: "New Conversation", created_at: new Date().toISOString(), mode };
       store.setConversations([guestConv, ...store.conversations]);
       store.setActiveConvId(guestId);
       return;
     }
     const { data, error } = await supabase
       .from("chat_conversations")
-      .insert({ user_id: user.id, title: "New Conversation" })
+      .insert({ user_id: user.id, title: "New Conversation", mode })
       .select()
       .single();
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return; }
@@ -91,6 +103,11 @@ export const AiConversationSidebar = () => {
         </motion.button>
       </div>
       <div className="flex-1 overflow-y-auto p-2 space-y-1">
+        {store.conversations.length === 0 && (
+          <p className="text-[10px] font-mono-tech text-muted-foreground text-center py-4 px-2">
+            No conversations in this mode yet
+          </p>
+        )}
         {store.conversations.map((conv) => (
           <div
             key={conv.id}

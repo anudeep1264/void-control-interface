@@ -74,7 +74,7 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
       store.setActiveConvId(guestId);
       return guestId;
     }
-    const { data, error } = await supabase.from("chat_conversations").insert({ user_id: user.id, title: "New Conversation" }).select().single();
+    const { data, error } = await supabase.from("chat_conversations").insert({ user_id: user.id, title: "New Conversation", mode }).select().single();
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return null; }
     store.setConversations([data, ...store.conversations]);
     store.setActiveConvId(data.id);
