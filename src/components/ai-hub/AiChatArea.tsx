@@ -144,18 +144,18 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
 
   return (
     <div className="flex-1 flex flex-col min-w-0">
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
         {messages.length === 0 && !isLoading && (
           <div className="flex-1 flex items-center justify-center h-full">
-            <div className="text-center space-y-4">
-              <ModeIcon className={`w-16 h-16 mx-auto mb-4 opacity-20 ${cfg.textColor}`} />
-              <h3 className={`font-display text-lg tracking-widest opacity-40 ${cfg.textColor}`}>{cfg.label}</h3>
-              <p className="text-xs font-mono-tech text-muted-foreground mt-2">{cfg.subtitle}</p>
+            <div className="text-center space-y-3 sm:space-y-4 px-4">
+              <ModeIcon className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 opacity-20 ${cfg.textColor}`} />
+              <h3 className={`font-display text-base sm:text-lg tracking-widest opacity-40 ${cfg.textColor}`}>{cfg.label}</h3>
+              <p className="text-[10px] sm:text-xs font-mono-tech text-muted-foreground mt-2">{cfg.subtitle}</p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={runDemo}
-                className={`mx-auto mt-4 flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-mono-tech tracking-wider border ${cfg.borderActive} ${cfg.bgActive} ${cfg.textColor} hover:opacity-80 transition-all`}
+                className={`mx-auto mt-3 sm:mt-4 flex items-center gap-2 px-4 py-2.5 sm:py-2 rounded-lg text-xs font-mono-tech tracking-wider border ${cfg.borderActive} ${cfg.bgActive} ${cfg.textColor} hover:opacity-80 transition-all`}
               >
                 <Play className="w-3 h-3" />
                 RUN DEMO
@@ -165,13 +165,13 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
         )}
         {messages.map((msg, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[80%] rounded-xl px-4 py-3 ${msg.role === "user" ? "bg-primary/15 border border-primary/30 text-foreground" : "holo-card border border-secondary/20 text-foreground"}`}>
+            <div className={`max-w-[90%] sm:max-w-[80%] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 ${msg.role === "user" ? "bg-primary/15 border border-primary/30 text-foreground" : "holo-card border border-secondary/20 text-foreground"}`}>
               {msg.role === "assistant" ? (
-                <div className="prose prose-sm prose-invert max-w-none text-sm font-body [&_code]:text-primary [&_code]:bg-muted [&_code]:px-1 [&_code]:rounded">
+                <div className="prose prose-sm prose-invert max-w-none text-xs sm:text-sm font-body [&_code]:text-primary [&_code]:bg-muted [&_code]:px-1 [&_code]:rounded">
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="text-sm font-body">{msg.content}</p>
+                <p className="text-xs sm:text-sm font-body">{msg.content}</p>
               )}
             </div>
           </motion.div>
@@ -186,7 +186,7 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
 
       <AiSmartSuggestions mode={mode} onSelect={(s) => sendMessage(s)} visible={showSuggestions} />
 
-      <div className="p-4 border-t border-border">
+      <div className="p-3 sm:p-4 border-t border-border">
         <div className="flex gap-2">
           <input
             type="text"
@@ -194,14 +194,14 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
             placeholder={cfg.placeholder}
-            className="flex-1 px-4 py-3 bg-muted border border-border rounded-lg text-foreground font-mono-tech text-sm placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
+            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-muted border border-border rounded-lg text-foreground font-mono-tech text-xs sm:text-sm placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
           />
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => sendMessage()}
             disabled={isLoading || !input.trim()}
-            className="px-4 py-3 rounded-lg bg-primary/20 border border-primary/30 text-primary glow-blue hover:bg-primary/30 transition-all disabled:opacity-50"
+            className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-primary/20 border border-primary/30 text-primary glow-blue hover:bg-primary/30 transition-all disabled:opacity-50"
           >
             <Send className="w-4 h-4" />
           </motion.button>

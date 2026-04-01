@@ -49,30 +49,30 @@ export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="flex items-center gap-2 px-4 py-1.5 bg-destructive/10 border-b border-destructive/20 text-[10px] font-mono-tech tracking-wider text-destructive">
-              <AlertTriangle className="w-3 h-3 animate-pulse" />
-              SECURITY ALERT: {alert}
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-destructive/10 border-b border-destructive/20 text-[9px] sm:text-[10px] font-mono-tech tracking-wider text-destructive">
+              <AlertTriangle className="w-3 h-3 animate-pulse shrink-0" />
+              <span className="truncate">ALERT: {alert}</span>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="flex items-center gap-4 px-4 py-2 text-[10px] font-mono-tech tracking-wider text-muted-foreground">
-        <div className="flex items-center gap-1.5">
-          <span className="relative flex h-2 w-2">
+      <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-mono-tech tracking-wider text-muted-foreground overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+          <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-accent" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-accent" />
           </span>
-          <span className="text-accent">AI ONLINE</span>
+          <span className="text-accent">ONLINE</span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <Activity className="w-3 h-3" />
-          MODE: <span className={cfg.textColor}>{cfg.label}</span>
+          <span className={cfg.textColor}>{cfg.label}</span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <Cpu className="w-3 h-3" />
-          LOAD: <span className={load > 60 ? "text-destructive" : "text-accent"}>{load}%</span>
+          <span className={load > 60 ? "text-destructive" : "text-accent"}>{load}%</span>
         </div>
-        <div className="flex items-center gap-1.5">
+        <div className="hidden sm:flex items-center gap-1.5 shrink-0">
           <Shield className="w-3 h-3" />
           <span className="text-accent">DEFENSE ACTIVE</span>
         </div>
