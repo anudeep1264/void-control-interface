@@ -1,15 +1,24 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, Cpu, Shield, AlertTriangle } from "lucide-react";
+import { Activity, Cpu, Shield, AlertTriangle, Satellite, Radio, Thermometer } from "lucide-react";
 import { type AiMode } from "@/lib/streamChat";
 import { MODE_CONFIG } from "./modeConfig";
 
 const ALERTS = [
-  "Firewall rule updated — port 443 secured",
-  "Anomaly detected in subnet 10.0.0.x — resolved",
-  "New threat signature loaded — defense engine updated",
-  "Brute force attempt blocked from 192.168.1.55",
-  "System integrity check passed — all modules nominal",
+  "Perimeter scan complete — all sectors clear",
+  "Quantum encryption layer refreshed",
+  "Anomalous signal detected in sector 7 — analyzing",
+  "Neural core temperature nominal",
+  "Deep space comm relay synchronized",
+  "Threat matrix updated — 0 active threats",
+];
+
+const SYSTEM_FEEDBACK = [
+  "Analyzing Command…",
+  "Executing Task…",
+  "Monitoring Systems…",
+  "Processing Neural Data…",
+  "Calibrating Sensors…",
 ];
 
 interface Props {
@@ -20,13 +29,29 @@ interface Props {
 export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
   const [load, setLoad] = useState(32);
   const [alert, setAlert] = useState<string | null>(null);
+  const [temp, setTemp] = useState(42);
+  const [feedback, setFeedback] = useState("");
   const cfg = MODE_CONFIG[mode];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setLoad(Math.floor(Math.random() * 40) + (isProcessing ? 45 : 15));
+      setTemp(Math.floor(Math.random() * 8) + (isProcessing ? 58 : 38));
     }, 3000);
     return () => clearInterval(interval);
+  }, [isProcessing]);
+
+  useEffect(() => {
+    if (isProcessing) {
+      const idx = Math.floor(Math.random() * SYSTEM_FEEDBACK.length);
+      setFeedback(SYSTEM_FEEDBACK[idx]);
+      const interval = setInterval(() => {
+        setFeedback(SYSTEM_FEEDBACK[Math.floor(Math.random() * SYSTEM_FEEDBACK.length)]);
+      }, 2500);
+      return () => clearInterval(interval);
+    } else {
+      setFeedback("");
+    }
   }, [isProcessing]);
 
   useEffect(() => {
@@ -40,7 +65,7 @@ export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
   }, []);
 
   return (
-    <div className="border-t border-border bg-card/60 backdrop-blur-sm">
+    <div className="border-t border-border/50 bg-card/40 backdrop-blur-sm">
       <AnimatePresence>
         {alert && (
           <motion.div
@@ -49,9 +74,9 @@ export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-destructive/10 border-b border-destructive/20 text-[9px] sm:text-[10px] font-mono-tech tracking-wider text-destructive">
-              <AlertTriangle className="w-3 h-3 animate-pulse shrink-0" />
-              <span className="truncate">ALERT: {alert}</span>
+            <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-primary/5 border-b border-primary/15 text-[9px] sm:text-[10px] font-mono-tech tracking-wider text-primary/80">
+              <Satellite className="w-3 h-3 animate-pulse shrink-0" />
+              <span className="truncate">COMMS: {alert}</span>
             </div>
           </motion.div>
         )}
@@ -70,12 +95,33 @@ export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
         </div>
         <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
           <Cpu className="w-3 h-3" />
-          <span className={load > 60 ? "text-destructive" : "text-accent"}>{load}%</span>
+          <span className={load > 60 ? "text-destructive" : "text-accent"}>{load}% LOAD</span>
+        </div>
+        <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+          <Thermometer className="w-3 h-3" />
+          <span className={temp > 60 ? "text-destructive" : "text-muted-foreground"}>{temp}°C</span>
         </div>
         <div className="hidden sm:flex items-center gap-1.5 shrink-0">
           <Shield className="w-3 h-3" />
-          <span className="text-accent">DEFENSE ACTIVE</span>
+          <span className="text-accent">SHIELDS UP</span>
         </div>
+        <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+          <Radio className="w-3 h-3" />
+          <span className="text-primary/60">COMMS ACTIVE</span>
+        </div>
+        <AnimatePresence>
+          {feedback && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="flex items-center gap-1.5 shrink-0 ml-auto"
+            >
+              <AlertTriangle className="w-3 h-3 text-primary animate-pulse" />
+              <span className="text-primary">{feedback}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

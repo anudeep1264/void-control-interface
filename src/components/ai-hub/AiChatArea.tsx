@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Play } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +10,8 @@ import { useConversationStore } from "./AiConversationSidebar";
 import { MODE_CONFIG } from "./modeConfig";
 import { AiSmartSuggestions } from "./AiSmartSuggestions";
 import { AiThinkingIndicator } from "./AiThinkingIndicator";
+import { VoiceControls } from "./VoiceControls";
+import { useVoice } from "@/hooks/useVoice";
 
 interface Props {
   mode: AiMode;
@@ -39,9 +41,11 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasStartedStreaming, setHasStartedStreaming] = useState(false);
+  const [autoSpeak, setAutoSpeak] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const prevConvIdRef = useRef<string | null>(null);
   const cfg = MODE_CONFIG[mode];
+  const voice = useVoice();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -81,7 +85,7 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
     return data.id;
   };
 
-  const sendMessage = async (overrideInput?: string) => {
+  const sendMessage = useCallback(async (overrideInput?: string) => {
     const text = overrideInput ?? input;
     if (!text.trim() || isLoading) return;
     const convId = await ensureConversation();
@@ -128,29 +132,42 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
           if (assistantSoFar && user) {
             await supabase.from("chat_messages").insert({ conversation_id: convId, user_id: user.id, role: "assistant", content: assistantSoFar });
           }
+          if (assistantSoFar && autoSpeak) {
+            voice.speak(assistantSoFar);
+          }
         },
         onError: (err) => { toast({ title: "AI ERROR", description: err, variant: "destructive" }); setIsLoading(false); onProcessingChange?.(false); },
       });
     } catch { setIsLoading(false); onProcessingChange?.(false); }
-  };
+  }, [input, isLoading, messages, mode, user, autoSpeak, voice, store]);
 
-  const runDemo = () => {
-    const script = DEMO_SCRIPTS[mode][0];
-    sendMessage(script);
-  };
+  const handleVoiceResult = useCallback((text: string) => {
+    if (text.trim()) sendMessage(text.trim());
+  }, [sendMessage]);
+
+  const runDemo = () => sendMessage(DEMO_SCRIPTS[mode][0]);
 
   const ModeIcon = cfg.icon;
   const showSuggestions = messages.length === 0 && !isLoading;
 
   return (
-    <div className="flex-1 flex flex-col min-w-0">
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4">
+    <div className="flex-1 flex flex-col min-w-0 command-panel">
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 custom-scrollbar grid-overlay">
         {messages.length === 0 && !isLoading && (
           <div className="flex-1 flex items-center justify-center h-full">
             <div className="text-center space-y-3 sm:space-y-4 px-4">
-              <ModeIcon className={`w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 opacity-20 ${cfg.textColor}`} />
-              <h3 className={`font-display text-base sm:text-lg tracking-widest opacity-40 ${cfg.textColor}`}>{cfg.label}</h3>
+              <div className="relative inline-block">
+                <ModeIcon className={`w-14 h-14 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 opacity-20 ${cfg.textColor}`} />
+                <motion.div
+                  className="absolute inset-0 rounded-full"
+                  style={{ border: "1px solid hsl(185 100% 50% / 0.1)" }}
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                />
+              </div>
+              <h3 className={`font-display text-sm sm:text-lg tracking-[0.3em] opacity-40 ${cfg.textColor}`}>{cfg.label}</h3>
               <p className="text-[10px] sm:text-xs font-mono-tech text-muted-foreground mt-2">{cfg.subtitle}</p>
+              <p className="text-[9px] font-mono-tech text-muted-foreground/50 tracking-widest">AWAITING COMMAND INPUT…</p>
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -165,7 +182,11 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
         )}
         {messages.map((msg, i) => (
           <motion.div key={i} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[90%] sm:max-w-[80%] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 ${msg.role === "user" ? "bg-primary/15 border border-primary/30 text-foreground" : "holo-card border border-secondary/20 text-foreground"}`}>
+            <div className={`max-w-[90%] sm:max-w-[80%] rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 ${
+              msg.role === "user"
+                ? "bg-primary/10 border border-primary/20 text-foreground"
+                : "holo-card border border-secondary/15 text-foreground"
+            }`}>
               {msg.role === "assistant" ? (
                 <div className="prose prose-sm prose-invert max-w-none text-xs sm:text-sm font-body [&_code]:text-primary [&_code]:bg-muted [&_code]:px-1 [&_code]:rounded">
                   <ReactMarkdown>{msg.content}</ReactMarkdown>
@@ -186,22 +207,30 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
 
       <AiSmartSuggestions mode={mode} onSelect={(s) => sendMessage(s)} visible={showSuggestions} />
 
-      <div className="p-3 sm:p-4 border-t border-border">
-        <div className="flex gap-2">
+      <div className="p-3 sm:p-4 border-t border-border/50 bg-card/30 backdrop-blur-sm">
+        <div className="flex gap-2 items-end">
+          <VoiceControls
+            voiceState={voice.state}
+            onStartListening={() => voice.startListening(handleVoiceResult)}
+            onStopListening={voice.stopListening}
+            onStopSpeaking={voice.stopSpeaking}
+            autoSpeak={autoSpeak}
+            onToggleAutoSpeak={() => setAutoSpeak(!autoSpeak)}
+          />
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-            placeholder={cfg.placeholder}
-            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-muted border border-border rounded-lg text-foreground font-mono-tech text-xs sm:text-sm placeholder:text-muted-foreground focus:border-primary/50 focus:outline-none focus:ring-1 focus:ring-primary/30 transition-all"
+            placeholder={voice.state === "listening" ? "Listening for voice input…" : cfg.placeholder}
+            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-muted/50 border border-border/50 rounded-lg text-foreground font-mono-tech text-xs sm:text-sm placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all"
           />
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => sendMessage()}
             disabled={isLoading || !input.trim()}
-            className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-primary/20 border border-primary/30 text-primary glow-blue hover:bg-primary/30 transition-all disabled:opacity-50"
+            className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-primary/15 border border-primary/25 text-primary hover:bg-primary/25 transition-all disabled:opacity-30"
           >
             <Send className="w-4 h-4" />
           </motion.button>

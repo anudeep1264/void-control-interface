@@ -42,7 +42,7 @@ export const AiThinkingIndicator = ({ mode, isThinking, hasStartedStreaming }: P
 
   if (!isThinking) return null;
 
-  const steps = ["Initializing neural network", "Processing input data", "Generating response", "Finalizing output"];
+  const steps = ["Initializing neural core", "Processing input signal", "Generating response matrix", "Finalizing output stream"];
 
   return (
     <motion.div
@@ -50,7 +50,7 @@ export const AiThinkingIndicator = ({ mode, isThinking, hasStartedStreaming }: P
       animate={{ opacity: 1, y: 0 }}
       className="flex justify-start px-4"
     >
-      <div className="holo-card rounded-xl px-4 py-3 border border-secondary/20 max-w-[80%] space-y-2">
+      <div className="command-panel rounded-xl px-4 py-3 border border-primary/15 max-w-[80%] space-y-2">
         <div className={`flex items-center gap-2 text-xs font-mono-tech tracking-wider ${cfg.textColor}`}>
           <span className="relative flex h-2 w-2">
             <span className={`animate-ping absolute inline-flex h-full w-full rounded-full ${cfg.dotColor} opacity-75`} />
@@ -61,10 +61,10 @@ export const AiThinkingIndicator = ({ mode, isThinking, hasStartedStreaming }: P
         {!hasStartedStreaming && (
           <div className="space-y-1">
             {steps.map((s, i) => (
-              <div key={i} className={`flex items-center gap-2 text-[10px] font-mono-tech tracking-wider transition-all duration-500 ${i <= step ? "text-muted-foreground" : "text-muted-foreground/30"}`}>
-                <span className={`w-1.5 h-1.5 rounded-full transition-all ${i <= step ? `${cfg.dotColor}` : "bg-muted-foreground/20"} ${i === step ? "animate-pulse" : ""}`} />
+              <div key={i} className={`flex items-center gap-2 text-[9px] font-mono-tech tracking-wider transition-all duration-500 ${i <= step ? "text-muted-foreground" : "text-muted-foreground/20"}`}>
+                <span className={`w-1.5 h-1.5 rounded-full transition-all ${i <= step ? `${cfg.dotColor}` : "bg-muted-foreground/15"} ${i === step ? "animate-pulse" : ""}`} />
                 {s}
-                {i < step && <span className="text-accent">✓</span>}
+                {i < step && <span className="text-accent text-[8px]">✓</span>}
               </div>
             ))}
           </div>

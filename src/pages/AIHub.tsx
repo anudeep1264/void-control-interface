@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Brain, Menu, X } from "lucide-react";
+import { Orbit, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { type AiMode } from "@/lib/streamChat";
 import { AiModeSwitcher } from "@/components/ai-hub/AiModeSwitcher";
@@ -17,20 +17,37 @@ const AIHub = () => {
   return (
     <div className="flex-1 flex flex-col overflow-hidden relative z-10">
       {/* Header bar */}
-      <div className="border-b border-border bg-card/60 backdrop-blur-sm">
+      <div className="border-b border-border/50 bg-card/40 backdrop-blur-sm">
         <div className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3">
-          {/* Mobile sidebar toggle */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-1.5 rounded-lg border border-border text-muted-foreground hover:text-primary hover:border-primary/30 transition-all"
+            className="lg:hidden p-1.5 rounded-lg border border-border/50 text-muted-foreground hover:text-primary hover:border-primary/30 transition-all"
           >
             {sidebarOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
-          <Brain className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
-          <h2 className="font-display text-xs sm:text-sm font-bold tracking-widest text-primary truncate">
-            AI HUB
-            <span className="hidden sm:inline"> — NEURAL INTERFACE</span>
+          <div className="relative">
+            <Orbit className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
+            <motion.div
+              className="absolute inset-0"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+            >
+              <div className="w-1 h-1 rounded-full bg-primary absolute -top-0.5 left-1/2 -translate-x-1/2" />
+            </motion.div>
+          </div>
+          <h2 className="font-display text-xs sm:text-sm font-bold tracking-[0.25em] text-primary truncate">
+            AI COMMAND
+            <span className="hidden sm:inline"> CENTER</span>
           </h2>
+          <div className="ml-auto flex items-center gap-2">
+            <div className="hidden sm:flex items-center gap-1.5 px-2 py-1 rounded bg-muted/30 border border-border/30">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
+                <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent" />
+              </span>
+              <span className="text-[9px] font-mono-tech text-accent tracking-widest">OPERATIONAL</span>
+            </div>
+          </div>
         </div>
         <AiModeSwitcher activeMode={mode} onModeChange={setMode} />
       </div>
@@ -42,7 +59,7 @@ const AIHub = () => {
           initial={{ opacity: 0, y: -4 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 4 }}
-          className={`px-3 sm:px-4 py-1.5 sm:py-2 border-b border-border flex items-center gap-2 text-[10px] sm:text-xs font-mono-tech tracking-wider ${cfg.textColor}`}
+          className={`px-3 sm:px-4 py-1.5 sm:py-2 border-b border-border/30 flex items-center gap-2 text-[10px] sm:text-xs font-mono-tech tracking-wider ${cfg.textColor}`}
         >
           <span className={`w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full ${cfg.dotColor} animate-pulse`} />
           <span className="truncate">
