@@ -6,54 +6,54 @@
 
 @layer base {
   :root {
-    --background: 230 25% 5%;
+    --background: 225 30% 3%;
     --foreground: 200 100% 90%;
 
-    --card: 230 30% 8%;
+    --card: 225 35% 6%;
     --card-foreground: 200 100% 90%;
 
-    --popover: 230 30% 8%;
+    --popover: 225 35% 6%;
     --popover-foreground: 200 100% 90%;
 
-    --primary: 195 100% 50%;
-    --primary-foreground: 230 25% 5%;
+    --primary: 185 100% 50%;
+    --primary-foreground: 225 30% 3%;
 
-    --secondary: 270 80% 55%;
+    --secondary: 260 80% 55%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 230 20% 14%;
-    --muted-foreground: 200 30% 55%;
+    --muted: 225 25% 10%;
+    --muted-foreground: 200 30% 50%;
 
     --accent: 145 100% 45%;
-    --accent-foreground: 230 25% 5%;
+    --accent-foreground: 225 30% 3%;
 
     --destructive: 0 85% 55%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 200 60% 20%;
-    --input: 230 25% 15%;
-    --ring: 195 100% 50%;
+    --border: 200 40% 15%;
+    --input: 225 25% 12%;
+    --ring: 185 100% 50%;
 
     --radius: 0.5rem;
 
-    --neon-blue: 195 100% 50%;
-    --neon-purple: 270 80% 55%;
+    --neon-blue: 185 100% 50%;
+    --neon-purple: 260 80% 55%;
     --neon-green: 145 100% 45%;
-    --neon-cyan: 180 100% 50%;
+    --neon-cyan: 185 100% 55%;
     --neon-pink: 320 100% 55%;
 
-    --glow-blue: 0 0 20px hsl(195 100% 50% / 0.5), 0 0 40px hsl(195 100% 50% / 0.2);
-    --glow-purple: 0 0 20px hsl(270 80% 55% / 0.5), 0 0 40px hsl(270 80% 55% / 0.2);
+    --glow-blue: 0 0 20px hsl(185 100% 50% / 0.5), 0 0 40px hsl(185 100% 50% / 0.2);
+    --glow-purple: 0 0 20px hsl(260 80% 55% / 0.5), 0 0 40px hsl(260 80% 55% / 0.2);
     --glow-green: 0 0 20px hsl(145 100% 45% / 0.5), 0 0 40px hsl(145 100% 45% / 0.2);
 
-    --sidebar-background: 230 30% 6%;
+    --sidebar-background: 225 35% 4%;
     --sidebar-foreground: 200 100% 85%;
-    --sidebar-primary: 195 100% 50%;
-    --sidebar-primary-foreground: 230 25% 5%;
-    --sidebar-accent: 230 25% 12%;
+    --sidebar-primary: 185 100% 50%;
+    --sidebar-primary-foreground: 225 30% 3%;
+    --sidebar-accent: 225 25% 10%;
     --sidebar-accent-foreground: 200 100% 85%;
-    --sidebar-border: 200 60% 15%;
-    --sidebar-ring: 195 100% 50%;
+    --sidebar-border: 200 40% 12%;
+    --sidebar-ring: 185 100% 50%;
   }
 }
 
@@ -93,11 +93,11 @@
   }
 
   .text-glow-blue {
-    text-shadow: 0 0 10px hsl(195 100% 50% / 0.8), 0 0 20px hsl(195 100% 50% / 0.4);
+    text-shadow: 0 0 10px hsl(185 100% 50% / 0.8), 0 0 20px hsl(185 100% 50% / 0.4);
   }
 
   .text-glow-purple {
-    text-shadow: 0 0 10px hsl(270 80% 55% / 0.8), 0 0 20px hsl(270 80% 55% / 0.4);
+    text-shadow: 0 0 10px hsl(260 80% 55% / 0.8), 0 0 20px hsl(260 80% 55% / 0.4);
   }
 
   .text-glow-green {
@@ -105,13 +105,13 @@
   }
 
   .border-glow-blue {
-    border-color: hsl(195 100% 50% / 0.4);
-    box-shadow: inset 0 0 15px hsl(195 100% 50% / 0.05), 0 0 15px hsl(195 100% 50% / 0.1);
+    border-color: hsl(185 100% 50% / 0.4);
+    box-shadow: inset 0 0 15px hsl(185 100% 50% / 0.05), 0 0 15px hsl(185 100% 50% / 0.1);
   }
 
   .border-glow-purple {
-    border-color: hsl(270 80% 55% / 0.4);
-    box-shadow: inset 0 0 15px hsl(270 80% 55% / 0.05), 0 0 15px hsl(270 80% 55% / 0.1);
+    border-color: hsl(260 80% 55% / 0.4);
+    box-shadow: inset 0 0 15px hsl(260 80% 55% / 0.05), 0 0 15px hsl(260 80% 55% / 0.1);
   }
 
   .border-glow-green {
@@ -120,19 +120,34 @@
   }
 
   .holo-card {
-    background: linear-gradient(135deg, hsl(230 30% 10% / 0.9), hsl(230 30% 6% / 0.95));
-    border: 1px solid hsl(195 100% 50% / 0.2);
-    backdrop-filter: blur(10px);
+    background: linear-gradient(135deg, hsl(225 35% 7% / 0.95), hsl(225 35% 4% / 0.98));
+    border: 1px solid hsl(185 100% 50% / 0.15);
+    backdrop-filter: blur(12px);
     box-shadow: 
-      inset 0 1px 0 hsl(195 100% 50% / 0.1),
-      0 0 20px hsl(195 100% 50% / 0.05);
+      inset 0 1px 0 hsl(185 100% 50% / 0.08),
+      0 0 20px hsl(185 100% 50% / 0.03);
   }
 
   .holo-card:hover {
-    border-color: hsl(195 100% 50% / 0.5);
+    border-color: hsl(185 100% 50% / 0.4);
     box-shadow: 
-      inset 0 1px 0 hsl(195 100% 50% / 0.15),
-      0 0 30px hsl(195 100% 50% / 0.15);
+      inset 0 1px 0 hsl(185 100% 50% / 0.12),
+      0 0 30px hsl(185 100% 50% / 0.1);
+  }
+
+  .command-panel {
+    background: linear-gradient(180deg, hsl(225 35% 6% / 0.97), hsl(225 40% 4% / 0.99));
+    border: 1px solid hsl(185 100% 50% / 0.12);
+    box-shadow: 
+      inset 0 0 40px hsl(185 100% 50% / 0.02),
+      0 0 1px hsl(185 100% 50% / 0.3);
+  }
+
+  .grid-overlay {
+    background-image: 
+      linear-gradient(hsl(185 100% 50% / 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(185 100% 50% / 0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
   }
 
   .scanline {
@@ -140,11 +155,17 @@
       0deg,
       transparent,
       transparent 2px,
-      hsl(195 100% 50% / 0.03) 2px,
-      hsl(195 100% 50% / 0.03) 4px
+      hsl(185 100% 50% / 0.02) 2px,
+      hsl(185 100% 50% / 0.02) 4px
     );
     pointer-events: none;
   }
+}
+
+/* Scanning line animation */
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
 }
 
 @keyframes pulse-glow {
@@ -167,6 +188,17 @@
   100% { background-position: 0% 50%; }
 }
 
+@keyframes light-streak {
+  0% { transform: translateX(-100%) skewX(-20deg); opacity: 0; }
+  50% { opacity: 0.6; }
+  100% { transform: translateX(200%) skewX(-20deg); opacity: 0; }
+}
+
+@keyframes voice-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2); opacity: 0; }
+}
+
 /* Hide scrollbar for mode tabs */
 .scrollbar-hide {
   -ms-overflow-style: none;
@@ -174,4 +206,19 @@
 }
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+/* Slim custom scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: hsl(185 100% 50% / 0.2);
+  border-radius: 2px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: hsl(185 100% 50% / 0.4);
 }
