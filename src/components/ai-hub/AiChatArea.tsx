@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Play } from "lucide-react";
+import { Send, Orbit } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { streamChat, type Msg, type AiMode } from "@/lib/streamChat";
@@ -11,6 +11,7 @@ import { MODE_CONFIG } from "./modeConfig";
 import { AiSmartSuggestions } from "./AiSmartSuggestions";
 import { AiThinkingIndicator } from "./AiThinkingIndicator";
 import { VoiceControls } from "./VoiceControls";
+import { AutopilotDemo } from "./AutopilotDemo";
 import { useVoice } from "@/hooks/useVoice";
 
 interface Props {
@@ -67,18 +68,18 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
       .select("*")
       .eq("conversation_id", convId)
       .order("created_at");
-    if (data) setMessages(data.map((m) => ({ role: m.role as "user" | "assistant", content: m.content })));
+    if (data) setMessages(data.map(m => ({ role: m.role as "user" | "assistant", content: m.content })));
   };
 
   const ensureConversation = async (): Promise<string | null> => {
     if (store.activeConvId) return store.activeConvId;
     if (!user) {
       const guestId = crypto.randomUUID();
-      store.setConversations([{ id: guestId, title: "New Conversation", created_at: new Date().toISOString() }, ...store.conversations]);
+      store.setConversations([{ id: guestId, title: "New Session", created_at: new Date().toISOString() }, ...store.conversations]);
       store.setActiveConvId(guestId);
       return guestId;
     }
-    const { data, error } = await supabase.from("chat_conversations").insert({ user_id: user.id, title: "New Conversation", mode }).select().single();
+    const { data, error } = await supabase.from("chat_conversations").insert({ user_id: user.id, title: "New Session", mode }).select().single();
     if (error) { toast({ title: "Error", description: error.message, variant: "destructive" }); return null; }
     store.setConversations([data, ...store.conversations]);
     store.setActiveConvId(data.id);
@@ -106,14 +107,14 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
     if (messages.length === 0) {
       const title = userMsg.content.slice(0, 50) + (userMsg.content.length > 50 ? "..." : "");
       if (user) await supabase.from("chat_conversations").update({ title }).eq("id", convId);
-      store.setConversations(store.conversations.map((c) => c.id === convId ? { ...c, title } : c));
+      store.setConversations(store.conversations.map(c => c.id === convId ? { ...c, title } : c));
     }
 
     let assistantSoFar = "";
     const upsertAssistant = (chunk: string) => {
       if (!hasStartedStreaming) setHasStartedStreaming(true);
       assistantSoFar += chunk;
-      setMessages((prev) => {
+      setMessages(prev => {
         const last = prev[prev.length - 1];
         if (last?.role === "assistant") return prev.map((m, i) => (i === prev.length - 1 ? { ...m, content: assistantSoFar } : m));
         return [...prev, { role: "assistant", content: assistantSoFar }];
@@ -151,32 +152,52 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
   const showSuggestions = messages.length === 0 && !isLoading;
 
   return (
-    <div className="flex-1 flex flex-col min-w-0 command-panel">
-      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 sm:space-y-4 custom-scrollbar grid-overlay">
+    <div className="flex-1 flex flex-col min-w-0 relative">
+      {/* Subtle grid overlay */}
+      <div className="absolute inset-0 grid-overlay pointer-events-none opacity-40" />
+
+      <div className="flex-1 overflow-y-auto p-3 sm:p-4 space-y-3 custom-scrollbar relative z-10">
         {messages.length === 0 && !isLoading && (
           <div className="flex-1 flex items-center justify-center h-full">
-            <div className="text-center space-y-3 sm:space-y-4 px-4">
+            <div className="text-center space-y-3 px-4">
+              {/* AI Core visual */}
               <div className="relative inline-block">
-                <ModeIcon className={`w-14 h-14 sm:w-20 sm:h-20 mx-auto mb-3 sm:mb-4 opacity-20 ${cfg.textColor}`} />
+                <div className="relative">
+                  <Orbit className={`w-16 h-16 sm:w-24 sm:h-24 mx-auto opacity-15 ${cfg.textColor}`} />
+                  <motion.div
+                    className="absolute inset-0 flex items-center justify-center"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+                  >
+                    <div className={`w-2 h-2 rounded-full ${cfg.dotColor} absolute -top-1`} />
+                  </motion.div>
+                  <motion.div
+                    className="absolute inset-0 flex items-center justify-center"
+                    animate={{ rotate: -360 }}
+                    transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+                  >
+                    <div className="w-1.5 h-1.5 rounded-full bg-secondary absolute -bottom-1" />
+                  </motion.div>
+                </div>
                 <motion.div
-                  className="absolute inset-0 rounded-full"
-                  style={{ border: "1px solid hsl(185 100% 50% / 0.1)" }}
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.3, 0, 0.3] }}
+                  className="absolute inset-0 rounded-full border border-primary/10"
+                  animate={{ scale: [1, 1.6, 1], opacity: [0.2, 0, 0.2] }}
                   transition={{ duration: 3, repeat: Infinity }}
                 />
+                <motion.div
+                  className="absolute inset-0 rounded-full border border-secondary/10"
+                  animate={{ scale: [1.2, 1.8, 1.2], opacity: [0.15, 0, 0.15] }}
+                  transition={{ duration: 4, repeat: Infinity, delay: 1 }}
+                />
               </div>
+
               <h3 className={`font-display text-sm sm:text-lg tracking-[0.3em] opacity-40 ${cfg.textColor}`}>{cfg.label}</h3>
-              <p className="text-[10px] sm:text-xs font-mono-tech text-muted-foreground mt-2">{cfg.subtitle}</p>
-              <p className="text-[9px] font-mono-tech text-muted-foreground/50 tracking-widest">AWAITING COMMAND INPUT…</p>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={runDemo}
-                className={`mx-auto mt-3 sm:mt-4 flex items-center gap-2 px-4 py-2.5 sm:py-2 rounded-lg text-xs font-mono-tech tracking-wider border ${cfg.borderActive} ${cfg.bgActive} ${cfg.textColor} hover:opacity-80 transition-all`}
-              >
-                <Play className="w-3 h-3" />
-                RUN DEMO
-              </motion.button>
+              <p className="text-[10px] sm:text-xs font-mono-tech text-muted-foreground">{cfg.subtitle}</p>
+              <p className="text-[8px] font-mono-tech text-muted-foreground/40 tracking-[0.3em]">NEURAL CORE AWAITING INPUT…</p>
+
+              <div className="flex items-center justify-center gap-2 mt-3">
+                <AutopilotDemo onRunDemo={runDemo} isProcessing={isLoading} />
+              </div>
             </div>
           </div>
         )}
@@ -205,9 +226,10 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
         <div ref={messagesEndRef} />
       </div>
 
-      <AiSmartSuggestions mode={mode} onSelect={(s) => sendMessage(s)} visible={showSuggestions} />
+      <AiSmartSuggestions mode={mode} onSelect={s => sendMessage(s)} visible={showSuggestions} />
 
-      <div className="p-3 sm:p-4 border-t border-border/50 bg-card/30 backdrop-blur-sm">
+      {/* Input area */}
+      <div className="p-3 border-t border-border/40 bg-card/30 backdrop-blur-sm relative z-10">
         <div className="flex gap-2 items-end">
           <VoiceControls
             voiceState={voice.state}
@@ -220,17 +242,17 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
           <input
             type="text"
             value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
-            placeholder={voice.state === "listening" ? "Listening for voice input…" : cfg.placeholder}
-            className="flex-1 px-3 sm:px-4 py-2.5 sm:py-3 bg-muted/50 border border-border/50 rounded-lg text-foreground font-mono-tech text-xs sm:text-sm placeholder:text-muted-foreground/50 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all"
+            onChange={e => setInput(e.target.value)}
+            onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
+            placeholder={voice.state === "listening" ? "Listening for voice command…" : cfg.placeholder}
+            className="flex-1 px-3 py-2.5 bg-muted/40 border border-border/40 rounded-lg text-foreground font-mono-tech text-xs placeholder:text-muted-foreground/40 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all"
           />
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => sendMessage()}
             disabled={isLoading || !input.trim()}
-            className="px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg bg-primary/15 border border-primary/25 text-primary hover:bg-primary/25 transition-all disabled:opacity-30"
+            className="px-3 py-2.5 rounded-lg bg-primary/15 border border-primary/25 text-primary hover:bg-primary/25 transition-all disabled:opacity-30"
           >
             <Send className="w-4 h-4" />
           </motion.button>

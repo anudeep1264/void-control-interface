@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Activity, Cpu, Shield, AlertTriangle, Satellite, Radio, Thermometer } from "lucide-react";
+import { Activity, Shield, AlertTriangle, Satellite, Radio } from "lucide-react";
 import { type AiMode } from "@/lib/streamChat";
 import { MODE_CONFIG } from "./modeConfig";
 
@@ -11,14 +11,17 @@ const ALERTS = [
   "Neural core temperature nominal",
   "Deep space comm relay synchronized",
   "Threat matrix updated — 0 active threats",
+  "Multi-agent orchestration synchronized",
+  "Context memory checkpointed",
 ];
 
 const SYSTEM_FEEDBACK = [
-  "Analyzing Command…",
-  "Executing Task…",
-  "Monitoring Systems…",
+  "Analyzing Intent…",
+  "Selecting Optimal Mode…",
+  "Executing Multi-Agent Task…",
+  "Monitoring Security…",
   "Processing Neural Data…",
-  "Calibrating Sensors…",
+  "Calibrating Response Matrix…",
 ];
 
 interface Props {
@@ -27,19 +30,9 @@ interface Props {
 }
 
 export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
-  const [load, setLoad] = useState(32);
   const [alert, setAlert] = useState<string | null>(null);
-  const [temp, setTemp] = useState(42);
   const [feedback, setFeedback] = useState("");
   const cfg = MODE_CONFIG[mode];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setLoad(Math.floor(Math.random() * 40) + (isProcessing ? 45 : 15));
-      setTemp(Math.floor(Math.random() * 8) + (isProcessing ? 58 : 38));
-    }, 3000);
-    return () => clearInterval(interval);
-  }, [isProcessing]);
 
   useEffect(() => {
     if (isProcessing) {
@@ -47,7 +40,7 @@ export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
       setFeedback(SYSTEM_FEEDBACK[idx]);
       const interval = setInterval(() => {
         setFeedback(SYSTEM_FEEDBACK[Math.floor(Math.random() * SYSTEM_FEEDBACK.length)]);
-      }, 2500);
+      }, 2200);
       return () => clearInterval(interval);
     } else {
       setFeedback("");
@@ -60,12 +53,12 @@ export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
       setAlert(msg);
       setTimeout(() => setAlert(null), 4000);
     };
-    const interval = setInterval(showAlert, 15000 + Math.random() * 10000);
+    const interval = setInterval(showAlert, 12000 + Math.random() * 8000);
     return () => clearInterval(interval);
   }, []);
 
   return (
-    <div className="border-t border-border/50 bg-card/40 backdrop-blur-sm">
+    <div className="border-t border-border/40 bg-card/40 backdrop-blur-sm shrink-0">
       <AnimatePresence>
         {alert && (
           <motion.div
@@ -74,38 +67,30 @@ export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
             exit={{ height: 0, opacity: 0 }}
             className="overflow-hidden"
           >
-            <div className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-primary/5 border-b border-primary/15 text-[9px] sm:text-[10px] font-mono-tech tracking-wider text-primary/80">
+            <div className="flex items-center gap-2 px-3 py-1 bg-primary/5 border-b border-primary/15 text-[9px] font-mono-tech tracking-wider text-primary/80">
               <Satellite className="w-3 h-3 animate-pulse shrink-0" />
               <span className="truncate">COMMS: {alert}</span>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="flex items-center gap-2 sm:gap-4 px-3 sm:px-4 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-mono-tech tracking-wider text-muted-foreground overflow-x-auto scrollbar-hide">
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          <span className="relative flex h-1.5 w-1.5 sm:h-2 sm:w-2">
+      <div className="flex items-center gap-2 sm:gap-3 px-3 py-1.5 text-[9px] font-mono-tech tracking-wider text-muted-foreground overflow-x-auto scrollbar-hide">
+        <div className="flex items-center gap-1 shrink-0">
+          <span className="relative flex h-1.5 w-1.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-accent opacity-75" />
-            <span className="relative inline-flex rounded-full h-1.5 w-1.5 sm:h-2 sm:w-2 bg-accent" />
+            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-accent" />
           </span>
           <span className="text-accent">ONLINE</span>
         </div>
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
+        <div className="flex items-center gap-1 shrink-0">
           <Activity className="w-3 h-3" />
           <span className={cfg.textColor}>{cfg.label}</span>
         </div>
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0">
-          <Cpu className="w-3 h-3" />
-          <span className={load > 60 ? "text-destructive" : "text-accent"}>{load}% LOAD</span>
-        </div>
-        <div className="hidden sm:flex items-center gap-1.5 shrink-0">
-          <Thermometer className="w-3 h-3" />
-          <span className={temp > 60 ? "text-destructive" : "text-muted-foreground"}>{temp}°C</span>
-        </div>
-        <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+        <div className="hidden sm:flex items-center gap-1 shrink-0">
           <Shield className="w-3 h-3" />
           <span className="text-accent">SHIELDS UP</span>
         </div>
-        <div className="hidden sm:flex items-center gap-1.5 shrink-0">
+        <div className="hidden sm:flex items-center gap-1 shrink-0">
           <Radio className="w-3 h-3" />
           <span className="text-primary/60">COMMS ACTIVE</span>
         </div>
@@ -115,10 +100,10 @@ export const AiSystemStatus = ({ mode, isProcessing }: Props) => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex items-center gap-1.5 shrink-0 ml-auto"
+              className="flex items-center gap-1 shrink-0 ml-auto"
             >
-              <AlertTriangle className="w-3 h-3 text-primary animate-pulse" />
-              <span className="text-primary">{feedback}</span>
+              <AlertTriangle className="w-3 h-3 text-secondary animate-pulse" />
+              <span className="text-secondary">{feedback}</span>
             </motion.div>
           )}
         </AnimatePresence>
