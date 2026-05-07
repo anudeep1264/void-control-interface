@@ -207,8 +207,9 @@ const Dashboard = () => {
               </motion.div>
             );
           })}
-        </motion.div>
+      </motion.div>
       </div>
+    </div>
 
       {/* Status Bar */}
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="flex items-center gap-2 px-1">
