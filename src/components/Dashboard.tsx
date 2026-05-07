@@ -78,41 +78,60 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 sm:p-6 relative z-10 space-y-5 grid-overlay custom-scrollbar">
-      {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <Orbit className="w-6 h-6 text-primary" />
-            <motion.div
-              className="absolute inset-0"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+    <div className="flex-1 overflow-y-auto relative z-10 grid-overlay custom-scrollbar">
+      {/* Hero Banner */}
+      <div className="relative overflow-hidden border-b border-primary/15">
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-secondary/8" />
+        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse 60% 100% at 50% 0%, hsl(188 95% 55% / 0.12), transparent 70%)" }} />
+        <div className="absolute top-0 left-0 right-0 divider-glow" />
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="relative flex items-center justify-between gap-4 p-4 sm:p-6"
+        >
+          <div className="flex items-center gap-4">
+            <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl glass-panel flex items-center justify-center shrink-0">
+              <Orbit className="w-6 h-6 text-primary" />
+              <motion.div
+                className="absolute inset-0"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 14, repeat: Infinity, ease: "linear" }}
+              >
+                <div className="w-1.5 h-1.5 rounded-full bg-primary absolute -top-0.5 left-1/2 -translate-x-1/2 shadow-[0_0_8px_hsl(188_95%_55%)]" />
+              </motion.div>
+              <motion.div
+                className="absolute -inset-1 rounded-2xl border border-primary/20"
+                animate={{ scale: [1, 1.15, 1], opacity: [0.4, 0, 0.4] }}
+                transition={{ duration: 2.5, repeat: Infinity }}
+              />
+            </div>
+            <div>
+              <h2 className="font-display text-xl sm:text-3xl font-bold tracking-[0.2em] text-gradient-cyan leading-tight">COMMAND CENTER</h2>
+              <p className="text-[10px] sm:text-xs font-mono-tech text-muted-foreground tracking-[0.35em] mt-1">
+                <span className="inline-block w-2 h-2 rounded-full bg-accent animate-pulse mr-2 align-middle" />
+                SPACE OPERATIONS · DASHBOARD
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            <div className="hidden sm:flex items-center gap-2 px-3 py-2 rounded-lg glass-panel">
+              <Clock className="w-3.5 h-3.5 text-primary/70" />
+              <span className="text-xs font-mono-tech text-primary/90 tracking-wider">{currentTime}</span>
+            </div>
+            <motion.button
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={runDiagnostics}
+              disabled={diagRunning}
+              className="relative px-3 sm:px-5 py-2 rounded-lg font-display text-[10px] sm:text-xs tracking-[0.2em] text-primary-foreground bg-gradient-to-r from-primary to-primary/70 shadow-[0_0_20px_hsl(188_95%_55%/0.4)] hover:shadow-[0_0_30px_hsl(188_95%_55%/0.6)] transition-all disabled:opacity-50"
             >
-              <div className="w-1 h-1 rounded-full bg-primary absolute -top-0.5 left-1/2 -translate-x-1/2" />
-            </motion.div>
+              {diagRunning ? "SCANNING…" : "RUN DIAGNOSTICS"}
+            </motion.button>
           </div>
-          <div>
-            <h2 className="font-display text-lg sm:text-xl font-bold text-primary tracking-[0.25em]">COMMAND CENTER</h2>
-            <p className="text-[9px] font-mono-tech text-muted-foreground tracking-[0.3em]">SPACE OPERATIONS DASHBOARD</p>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 border border-primary/15">
-            <Clock className="w-3.5 h-3.5 text-primary/60" />
-            <span className="text-xs font-mono-tech text-primary/80 tracking-wider">{currentTime}</span>
-          </div>
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={runDiagnostics}
-            disabled={diagRunning}
-            className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg bg-primary/8 border border-primary/20 text-primary font-display text-[10px] sm:text-xs tracking-wider hover:bg-primary/15 transition-all disabled:opacity-50"
-          >
-            {diagRunning ? "SCANNING…" : "RUN DIAGNOSTICS"}
-          </motion.button>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
+
+      <div className="p-4 sm:p-6 space-y-5">
 
       {/* Stat Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -188,7 +207,7 @@ const Dashboard = () => {
               </motion.div>
             );
           })}
-        </motion.div>
+      </motion.div>
       </div>
 
       {/* Status Bar */}
@@ -201,6 +220,7 @@ const Dashboard = () => {
           ALL SYSTEMS NOMINAL — UPTIME: 99.99% — AUTO-REFRESH: ON
         </span>
       </motion.div>
+      </div>
     </div>
   );
 };

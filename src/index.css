@@ -6,26 +6,26 @@
 
 @layer base {
   :root {
-    --background: 225 30% 3%;
-    --foreground: 200 100% 90%;
+    --background: 224 45% 4%;
+    --foreground: 195 60% 92%;
 
-    --card: 225 35% 6%;
-    --card-foreground: 200 100% 90%;
+    --card: 223 40% 7%;
+    --card-foreground: 195 60% 92%;
 
-    --popover: 225 35% 6%;
-    --popover-foreground: 200 100% 90%;
+    --popover: 223 40% 7%;
+    --popover-foreground: 195 60% 92%;
 
-    --primary: 185 100% 50%;
-    --primary-foreground: 225 30% 3%;
+    --primary: 188 95% 55%;
+    --primary-foreground: 224 45% 4%;
 
-    --secondary: 260 80% 55%;
+    --secondary: 258 75% 62%;
     --secondary-foreground: 0 0% 100%;
 
-    --muted: 225 25% 10%;
-    --muted-foreground: 200 30% 50%;
+    --muted: 223 30% 11%;
+    --muted-foreground: 200 25% 60%;
 
-    --accent: 145 100% 45%;
-    --accent-foreground: 225 30% 3%;
+    --accent: 158 85% 50%;
+    --accent-foreground: 224 45% 4%;
 
     --destructive: 0 85% 55%;
     --destructive-foreground: 0 0% 100%;
@@ -64,6 +64,11 @@
 
   body {
     @apply bg-background text-foreground font-body;
+    background-image:
+      radial-gradient(ellipse 80% 60% at 20% 0%, hsl(258 70% 18% / 0.35), transparent 60%),
+      radial-gradient(ellipse 70% 50% at 100% 30%, hsl(188 80% 22% / 0.25), transparent 60%),
+      radial-gradient(ellipse 60% 50% at 50% 100%, hsl(220 60% 14% / 0.4), transparent 60%);
+    background-attachment: fixed;
   }
 }
 
@@ -120,45 +125,94 @@
   }
 
   .holo-card {
-    background: linear-gradient(135deg, hsl(225 35% 7% / 0.95), hsl(225 35% 4% / 0.98));
-    border: 1px solid hsl(185 100% 50% / 0.15);
-    backdrop-filter: blur(12px);
-    box-shadow: 
-      inset 0 1px 0 hsl(185 100% 50% / 0.08),
-      0 0 20px hsl(185 100% 50% / 0.03);
+    position: relative;
+    background:
+      linear-gradient(135deg, hsl(223 40% 9% / 0.85), hsl(223 45% 5% / 0.92)),
+      radial-gradient(circle at 0% 0%, hsl(188 95% 55% / 0.08), transparent 50%);
+    border: 1px solid hsl(188 95% 55% / 0.18);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    box-shadow:
+      inset 0 1px 0 hsl(188 95% 75% / 0.12),
+      inset 0 0 30px hsl(188 95% 55% / 0.03),
+      0 8px 32px -8px hsl(224 60% 2% / 0.6),
+      0 0 24px -4px hsl(188 95% 55% / 0.08);
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .holo-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(188 95% 55% / 0.4), transparent 40%, hsl(258 75% 62% / 0.3));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+            mask-composite: exclude;
+    pointer-events: none;
+    opacity: 0.6;
   }
 
   .holo-card:hover {
-    border-color: hsl(185 100% 50% / 0.4);
-    box-shadow: 
-      inset 0 1px 0 hsl(185 100% 50% / 0.12),
-      0 0 30px hsl(185 100% 50% / 0.1);
+    border-color: hsl(188 95% 55% / 0.45);
+    transform: translateY(-2px);
+    box-shadow:
+      inset 0 1px 0 hsl(188 95% 75% / 0.18),
+      inset 0 0 30px hsl(188 95% 55% / 0.06),
+      0 16px 40px -10px hsl(224 60% 2% / 0.7),
+      0 0 40px -4px hsl(188 95% 55% / 0.18);
   }
 
   .command-panel {
-    background: linear-gradient(180deg, hsl(225 35% 6% / 0.97), hsl(225 40% 4% / 0.99));
-    border: 1px solid hsl(185 100% 50% / 0.12);
-    box-shadow: 
-      inset 0 0 40px hsl(185 100% 50% / 0.02),
-      0 0 1px hsl(185 100% 50% / 0.3);
+    background:
+      linear-gradient(180deg, hsl(223 40% 8% / 0.95), hsl(223 45% 4% / 0.98));
+    border: 1px solid hsl(188 95% 55% / 0.14);
+    box-shadow:
+      inset 0 1px 0 hsl(188 95% 75% / 0.08),
+      inset 0 0 60px hsl(188 95% 55% / 0.025),
+      0 4px 24px -4px hsl(224 60% 2% / 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .grid-overlay {
-    background-image: 
-      linear-gradient(hsl(185 100% 50% / 0.03) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(185 100% 50% / 0.03) 1px, transparent 1px);
-    background-size: 40px 40px;
+    background-image:
+      linear-gradient(hsl(188 95% 55% / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, hsl(188 95% 55% / 0.035) 1px, transparent 1px);
+    background-size: 56px 56px;
+    mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 70% at 50% 40%, #000 40%, transparent 100%);
   }
 
   .scanline {
     background: repeating-linear-gradient(
       0deg,
       transparent,
-      transparent 2px,
-      hsl(185 100% 50% / 0.02) 2px,
-      hsl(185 100% 50% / 0.02) 4px
+      transparent 3px,
+      hsl(188 95% 55% / 0.018) 3px,
+      hsl(188 95% 55% / 0.018) 4px
     );
     pointer-events: none;
+  }
+
+  .glass-panel {
+    background: linear-gradient(180deg, hsl(223 40% 10% / 0.6), hsl(223 45% 5% / 0.7));
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    border: 1px solid hsl(188 95% 55% / 0.12);
+  }
+
+  .text-gradient-cyan {
+    background: linear-gradient(135deg, hsl(188 95% 70%), hsl(188 95% 50%) 40%, hsl(258 75% 70%));
+    -webkit-background-clip: text;
+            background-clip: text;
+    color: transparent;
+  }
+
+  .divider-glow {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, hsl(188 95% 55% / 0.5), transparent);
   }
 }
 
