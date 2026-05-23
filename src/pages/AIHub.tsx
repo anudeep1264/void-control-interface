@@ -78,6 +78,10 @@ const AIHub = () => {
         </div>
       </div>
 
+      {/* Live Monitoring Hero */}
+      <MonitoringHeroWidget />
+
+
       {/* Main 3-Column Layout */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* Mobile sidebar overlay */}
