@@ -6,6 +6,7 @@ import { AiChatArea } from "@/components/ai-hub/AiChatArea";
 import { CommandStatusBar } from "@/components/ai-hub/CommandStatusBar";
 import { LeftControlModules } from "@/components/ai-hub/LeftControlModules";
 import { RightIntelPanel } from "@/components/ai-hub/RightIntelPanel";
+import { MonitoringHeroWidget } from "@/components/ai-hub/MonitoringHeroWidget";
 import { MODE_CONFIG } from "@/components/ai-hub/modeConfig";
 
 const AIHub = () => {
@@ -76,6 +77,10 @@ const AIHub = () => {
           </div>
         </div>
       </div>
+
+      {/* Live Monitoring Hero */}
+      <MonitoringHeroWidget />
+
 
       {/* Main 3-Column Layout */}
       <div className="flex-1 flex overflow-hidden relative">
