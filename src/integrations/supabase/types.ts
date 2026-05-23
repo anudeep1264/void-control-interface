@@ -168,7 +168,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      generate_security_events: { Args: never; Returns: undefined }
+      [_ in never]: never
     }
     Enums: {
       [_ in never]: never
