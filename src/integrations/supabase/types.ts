@@ -105,6 +105,7 @@ export type Database = {
       }
       security_logs: {
         Row: {
+          ai_response: string | null
           created_at: string
           description: string
           event_type: string
@@ -114,6 +115,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          ai_response?: string | null
           created_at?: string
           description: string
           event_type: string
@@ -123,6 +125,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          ai_response?: string | null
           created_at?: string
           description?: string
           event_type?: string
@@ -165,7 +168,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_security_events: { Args: never; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
