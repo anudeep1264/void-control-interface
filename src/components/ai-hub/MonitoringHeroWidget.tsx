@@ -39,19 +39,41 @@ export const MonitoringHeroWidget = () => {
     return () => clearInterval(i);
   }, []);
 
-  // Simulated telemetry stream
+  // Pulse waveform animates locally (visual heartbeat)
   useEffect(() => {
     const i = setInterval(() => {
-      setPulse((prev) => {
-        const next = [...prev.slice(1), { t: prev[prev.length - 1].t + 1, v: 25 + Math.random() * 65 }];
-        return next;
-      });
-      setCpu((v) => Math.max(8, Math.min(95, v + (Math.random() - 0.5) * 14)));
-      setMem((v) => Math.max(15, Math.min(92, v + (Math.random() - 0.5) * 6)));
-      setNet((v) => Math.max(20, Math.min(99, v + (Math.random() - 0.5) * 18)));
+      setPulse((prev) => [
+        ...prev.slice(1),
+        { t: prev[prev.length - 1].t + 1, v: 25 + Math.random() * 35 },
+      ]);
     }, 900);
     return () => clearInterval(i);
   }, []);
+
+  // Real backend metrics from system-metrics edge function
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+
+    const fetchMetrics = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("system-metrics");
+        if (cancelled || error || !data) return;
+        setCpu(data.cpu);
+        setMem(data.mem);
+        setNet(data.net);
+      } catch {
+        /* keep last known values */
+      }
+    };
+
+    fetchMetrics();
+    const i = setInterval(fetchMetrics, 5000);
+    return () => {
+      cancelled = true;
+      clearInterval(i);
+    };
+  }, [user]);
 
   // Realtime security log subscription → bump event count + spike pulse
   useEffect(() => {
