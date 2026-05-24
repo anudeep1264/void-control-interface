@@ -15,6 +15,7 @@ import {
   Globe2,
   Lock,
   CheckCircle2,
+  Orbit,
 } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import Starfield from "@/components/landing/Starfield";
