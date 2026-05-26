@@ -15,21 +15,20 @@ export const SecurityLadder = ({ m, insights }: { m: MetricSnapshot; insights: I
         <h3 className="font-display text-sm tracking-widest">THREAT LEVEL</h3>
       </div>
       <div className="grid grid-cols-3 gap-2 mb-3">
-        {TIERS.map((t) => (
-          <div
-            key={t.key}
-            className={`rounded-md border px-2 py-2 text-center transition-all ${
-              m.threat_level === t.key
-                ? `${t.tone} bg-current/10 ring-1 ring-current`
-                : "border-border/30 text-muted-foreground"
-            }`}
-          >
-            <div className="text-[10px] font-mono uppercase tracking-widest">{t.label}</div>
-            {m.threat_level === t.key && (
-              <div className="text-[9px] font-mono mt-0.5">● ACTIVE</div>
-            )}
-          </div>
-        ))}
+        {TIERS.map((t) => {
+          const active = m.threat_level === t.key;
+          return (
+            <div
+              key={t.key}
+              className={`rounded-md border px-2 py-2 text-center transition-all ${
+                active ? `${t.tone} bg-background/40 ring-1 ring-current` : "border-border/30 text-muted-foreground"
+              }`}
+            >
+              <div className="text-[10px] font-mono uppercase tracking-widest">{t.label}</div>
+              {active && <div className="text-[9px] font-mono mt-0.5">● ACTIVE</div>}
+            </div>
+          );
+        })}
       </div>
       <div className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-1.5">Intelligent logs</div>
       <div className="space-y-1 max-h-32 overflow-y-auto custom-scrollbar">
