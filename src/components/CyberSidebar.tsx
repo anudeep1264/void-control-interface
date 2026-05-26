@@ -14,12 +14,14 @@ import {
   Orbit,
   LogOut,
   Radio,
+  Activity,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { icon: Home, label: "Command", path: "/dashboard" },
   { icon: Brain, label: "AI Hub", path: "/ai-hub" },
+  { icon: Activity, label: "Monitor", path: "/monitor" },
   { icon: Clock, label: "History", path: "/history" },
   { icon: CreditCard, label: "Subscriptions", path: "/subscriptions" },
   { icon: User, label: "Account", path: "/account" },

@@ -9,6 +9,7 @@ import Subscriptions from "@/pages/Subscriptions";
 import Account from "@/pages/Account";
 import SecurityLogs from "@/pages/SecurityLogs";
 import SettingsPage from "@/pages/Settings";
+import Monitor from "@/pages/Monitor";
 
 const Index = () => {
   const location = useLocation();
@@ -26,6 +27,7 @@ const Index = () => {
       <Routes>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/ai-hub" element={<AIHub />} />
+        <Route path="/monitor" element={<Monitor />} />
         <Route path="/history" element={<History />} />
         <Route path="/subscriptions" element={<Subscriptions />} />
         <Route path="/account" element={<Account />} />
