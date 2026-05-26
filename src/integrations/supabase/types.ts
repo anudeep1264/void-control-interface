@@ -76,6 +76,123 @@ export type Database = {
           },
         ]
       }
+      monitoring_insights: {
+        Row: {
+          created_at: string
+          detail: string | null
+          id: string
+          kind: string
+          severity: string
+          title: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind?: string
+          severity?: string
+          title: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          id?: string
+          kind?: string
+          severity?: string
+          title?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      monitoring_metrics: {
+        Row: {
+          active: boolean
+          captured_at: string
+          cpu: number
+          disk_rw: number
+          id: string
+          mem_gb: number
+          mem_pct: number
+          mem_total_gb: number
+          net_down: number
+          net_up: number
+          storage_total: number
+          storage_used: number
+          threat_level: string
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          captured_at?: string
+          cpu?: number
+          disk_rw?: number
+          id?: string
+          mem_gb?: number
+          mem_pct?: number
+          mem_total_gb?: number
+          net_down?: number
+          net_up?: number
+          storage_total?: number
+          storage_used?: number
+          threat_level?: string
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          captured_at?: string
+          cpu?: number
+          disk_rw?: number
+          id?: string
+          mem_gb?: number
+          mem_pct?: number
+          mem_total_gb?: number
+          net_down?: number
+          net_up?: number
+          storage_total?: number
+          storage_used?: number
+          threat_level?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      monitoring_sessions: {
+        Row: {
+          autopilot: boolean
+          id: string
+          idle_seconds: number
+          interactions: number
+          last_active_at: string
+          started_at: string
+          tab_visible: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          autopilot?: boolean
+          id?: string
+          idle_seconds?: number
+          interactions?: number
+          last_active_at?: string
+          started_at?: string
+          tab_visible?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          autopilot?: boolean
+          id?: string
+          idle_seconds?: number
+          interactions?: number
+          last_active_at?: string
+          started_at?: string
+          tab_visible?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
