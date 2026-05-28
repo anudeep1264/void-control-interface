@@ -161,6 +161,7 @@ export const AiChatArea = ({ mode, onProcessingChange, onDraftChange, injectedIn
     const allMessages = [...messages, userMsg];
     setMessages(allMessages);
     setInput("");
+    asiStore.recordMessage(mode, userMsg.content);
     setIsLoading(true);
     setHasStartedStreaming(false);
     onProcessingChange?.(true);
