@@ -13,10 +13,13 @@ import { AiThinkingIndicator } from "./AiThinkingIndicator";
 import { VoiceControls } from "./VoiceControls";
 import { AutopilotDemo } from "./AutopilotDemo";
 import { useVoice } from "@/hooks/useVoice";
+import { asiStore } from "@/lib/asiStore";
 
 interface Props {
   mode: AiMode;
   onProcessingChange?: (v: boolean) => void;
+  onDraftChange?: (v: string) => void;
+  injectedInput?: { value: string; nonce: number } | null;
 }
 
 const DEMO_SCRIPTS: Record<AiMode, string[]> = {
@@ -35,7 +38,7 @@ const DEMO_SCRIPTS: Record<AiMode, string[]> = {
   simulation: ["Simulate a DDoS attack on a web server and show the defense response"],
 };
 
-export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
+export const AiChatArea = ({ mode, onProcessingChange, onDraftChange, injectedInput }: Props) => {
   const { user } = useAuth();
   const store = useConversationStore();
   const [messages, setMessages] = useState<Msg[]>([]);
@@ -45,12 +48,24 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
   const [autoSpeak, setAutoSpeak] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const prevConvIdRef = useRef<string | null>(null);
+  const lastInjectedNonceRef = useRef<number>(-1);
   const cfg = MODE_CONFIG[mode];
   const voice = useVoice();
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    onDraftChange?.(input);
+  }, [input, onDraftChange]);
+
+  useEffect(() => {
+    if (injectedInput && injectedInput.nonce !== lastInjectedNonceRef.current) {
+      lastInjectedNonceRef.current = injectedInput.nonce;
+      setInput(injectedInput.value);
+    }
+  }, [injectedInput]);
 
   useEffect(() => {
     if (store.activeConvId && store.activeConvId !== prevConvIdRef.current) {
