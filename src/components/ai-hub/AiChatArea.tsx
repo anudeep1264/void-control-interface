@@ -86,6 +86,52 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
     return data.id;
   };
 
+  const generateImage = useCallback(async (prompt: string) => {
+    if (!prompt.trim() || isLoading) return;
+    const convId = await ensureConversation();
+    if (!convId) return;
+
+    const userMsg: Msg = { role: "user", content: `/image ${prompt.trim()}` };
+    setMessages(prev => [...prev, userMsg]);
+    setInput("");
+    setIsLoading(true);
+    setHasStartedStreaming(false);
+    onProcessingChange?.(true);
+
+    if (user) {
+      await supabase.from("chat_messages").insert({ conversation_id: convId, user_id: user.id, role: "user", content: userMsg.content });
+    }
+    if (messages.length === 0) {
+      const title = prompt.slice(0, 50);
+      if (user) await supabase.from("chat_conversations").update({ title }).eq("id", convId);
+      store.setConversations(store.conversations.map(c => c.id === convId ? { ...c, title } : c));
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-image", { body: { prompt: prompt.trim() } });
+      if (error || !data?.image_url) {
+        const msg = (data as any)?.error || error?.message || "Image generation failed";
+        toast({ title: "Image error", description: msg, variant: "destructive" });
+        setIsLoading(false);
+        onProcessingChange?.(false);
+        return;
+      }
+      const assistantContent = `![${prompt.trim()}](${data.image_url})\n\n_Generated: ${prompt.trim()}_`;
+      setMessages(prev => [...prev, { role: "assistant", content: assistantContent }]);
+      if (user) {
+        await Promise.all([
+          supabase.from("chat_messages").insert({ conversation_id: convId, user_id: user.id, role: "assistant", content: assistantContent }),
+          supabase.from("generated_images").insert({ user_id: user.id, conversation_id: convId, prompt: prompt.trim(), image_url: data.image_url, model: data.model || "google/gemini-2.5-flash-image" }),
+        ]);
+      }
+    } catch (e) {
+      toast({ title: "Image error", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+      onProcessingChange?.(false);
+    }
+  }, [isLoading, messages, user, store, onProcessingChange]);
+
   const sendMessage = useCallback(async (overrideInput?: string) => {
     const text = overrideInput ?? input;
     if (!text.trim() || isLoading) return;
