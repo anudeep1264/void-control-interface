@@ -76,6 +76,36 @@ export type Database = {
           },
         ]
       }
+      generated_images: {
+        Row: {
+          conversation_id: string | null
+          created_at: string
+          id: string
+          image_url: string
+          model: string
+          prompt: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          image_url: string
+          model?: string
+          prompt: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string | null
+          created_at?: string
+          id?: string
+          image_url?: string
+          model?: string
+          prompt?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       monitoring_insights: {
         Row: {
           created_at: string
