@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Orbit } from "lucide-react";
+import { Send, Orbit, ImagePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { streamChat, type Msg, type AiMode } from "@/lib/streamChat";
@@ -86,9 +86,59 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
     return data.id;
   };
 
+  const generateImage = useCallback(async (prompt: string) => {
+    if (!prompt.trim() || isLoading) return;
+    const convId = await ensureConversation();
+    if (!convId) return;
+
+    const userMsg: Msg = { role: "user", content: `/image ${prompt.trim()}` };
+    setMessages(prev => [...prev, userMsg]);
+    setInput("");
+    setIsLoading(true);
+    setHasStartedStreaming(false);
+    onProcessingChange?.(true);
+
+    if (user) {
+      await supabase.from("chat_messages").insert({ conversation_id: convId, user_id: user.id, role: "user", content: userMsg.content });
+    }
+    if (messages.length === 0) {
+      const title = prompt.slice(0, 50);
+      if (user) await supabase.from("chat_conversations").update({ title }).eq("id", convId);
+      store.setConversations(store.conversations.map(c => c.id === convId ? { ...c, title } : c));
+    }
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-image", { body: { prompt: prompt.trim() } });
+      if (error || !data?.image_url) {
+        const msg = (data as any)?.error || error?.message || "Image generation failed";
+        toast({ title: "Image error", description: msg, variant: "destructive" });
+        setIsLoading(false);
+        onProcessingChange?.(false);
+        return;
+      }
+      const assistantContent = `![${prompt.trim()}](${data.image_url})\n\n_Generated: ${prompt.trim()}_`;
+      setMessages(prev => [...prev, { role: "assistant", content: assistantContent }]);
+      if (user) {
+        await Promise.all([
+          supabase.from("chat_messages").insert({ conversation_id: convId, user_id: user.id, role: "assistant", content: assistantContent }),
+          supabase.from("generated_images").insert({ user_id: user.id, conversation_id: convId, prompt: prompt.trim(), image_url: data.image_url, model: data.model || "google/gemini-2.5-flash-image" }),
+        ]);
+      }
+    } catch (e) {
+      toast({ title: "Image error", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
+    } finally {
+      setIsLoading(false);
+      onProcessingChange?.(false);
+    }
+  }, [isLoading, messages, user, store, onProcessingChange]);
+
   const sendMessage = useCallback(async (overrideInput?: string) => {
     const text = overrideInput ?? input;
     if (!text.trim() || isLoading) return;
+    const trimmed = text.trim();
+    if (trimmed.toLowerCase().startsWith("/image ")) {
+      return generateImage(trimmed.slice(7));
+    }
     const convId = await ensureConversation();
     if (!convId) return;
 
@@ -209,11 +259,17 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
                 : "holo-card border border-secondary/15 text-foreground"
             }`}>
               {msg.role === "assistant" ? (
-                <div className="prose prose-sm prose-invert max-w-none text-xs sm:text-sm font-body [&_code]:text-primary [&_code]:bg-muted [&_code]:px-1 [&_code]:rounded">
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                <div className="prose prose-sm prose-invert max-w-none text-xs sm:text-sm font-body [&_code]:text-primary [&_code]:bg-muted [&_code]:px-1 [&_code]:rounded [&_img]:rounded-lg [&_img]:border [&_img]:border-primary/20 [&_img]:my-2 [&_img]:max-w-full">
+                  <ReactMarkdown
+                    components={{
+                      img: ({ node, ...props }) => (
+                        <img {...props} loading="lazy" alt={props.alt || "Generated image"} />
+                      ),
+                    }}
+                  >{msg.content}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="text-xs sm:text-sm font-body">{msg.content}</p>
+                <p className="text-xs sm:text-sm font-body whitespace-pre-wrap">{msg.content}</p>
               )}
             </div>
           </motion.div>
@@ -244,9 +300,22 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
-            placeholder={voice.state === "listening" ? "Listening for voice command…" : cfg.placeholder}
+            placeholder={voice.state === "listening" ? "Listening for voice command…" : `${cfg.placeholder} — try /image <prompt>`}
             className="flex-1 px-3 py-2.5 bg-muted/40 border border-border/40 rounded-lg text-foreground font-mono-tech text-xs placeholder:text-muted-foreground/40 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all"
           />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              const p = input.trim();
+              if (p) generateImage(p.replace(/^\/image\s+/i, ""));
+            }}
+            disabled={isLoading || !input.trim()}
+            title="Generate image from prompt"
+            className="px-3 py-2.5 rounded-lg bg-secondary/15 border border-secondary/25 text-secondary hover:bg-secondary/25 transition-all disabled:opacity-30"
+          >
+            <ImagePlus className="w-4 h-4" />
+          </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
