@@ -88,6 +88,14 @@ const AIHub = () => {
       {/* Live Monitoring Hero */}
       <MonitoringHeroWidget />
 
+      {/* ASI Superintelligence Layer */}
+      <ASICore
+        mode={mode}
+        onModeChange={setMode}
+        isProcessing={isProcessing}
+        draft={draft}
+        onUseSuggestion={injectSuggestion}
+      />
 
       {/* Main 3-Column Layout */}
       <div className="flex-1 flex overflow-hidden relative">
@@ -121,7 +129,12 @@ const AIHub = () => {
         </div>
 
         {/* Central AI Core */}
-        <AiChatArea mode={mode} onProcessingChange={setIsProcessing} />
+        <AiChatArea
+          mode={mode}
+          onProcessingChange={setIsProcessing}
+          onDraftChange={setDraft}
+          injectedInput={injectedInput}
+        />
 
         {/* Desktop Right Intel Panel */}
         <div className="hidden xl:block">
