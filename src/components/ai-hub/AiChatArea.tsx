@@ -300,9 +300,22 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === "Enter" && !e.shiftKey && sendMessage()}
-            placeholder={voice.state === "listening" ? "Listening for voice command…" : cfg.placeholder}
+            placeholder={voice.state === "listening" ? "Listening for voice command…" : `${cfg.placeholder} — try /image <prompt>`}
             className="flex-1 px-3 py-2.5 bg-muted/40 border border-border/40 rounded-lg text-foreground font-mono-tech text-xs placeholder:text-muted-foreground/40 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20 transition-all"
           />
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              const p = input.trim();
+              if (p) generateImage(p.replace(/^\/image\s+/i, ""));
+            }}
+            disabled={isLoading || !input.trim()}
+            title="Generate image from prompt"
+            className="px-3 py-2.5 rounded-lg bg-secondary/15 border border-secondary/25 text-secondary hover:bg-secondary/25 transition-all disabled:opacity-30"
+          >
+            <ImagePlus className="w-4 h-4" />
+          </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
