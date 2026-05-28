@@ -259,11 +259,17 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
                 : "holo-card border border-secondary/15 text-foreground"
             }`}>
               {msg.role === "assistant" ? (
-                <div className="prose prose-sm prose-invert max-w-none text-xs sm:text-sm font-body [&_code]:text-primary [&_code]:bg-muted [&_code]:px-1 [&_code]:rounded">
-                  <ReactMarkdown>{msg.content}</ReactMarkdown>
+                <div className="prose prose-sm prose-invert max-w-none text-xs sm:text-sm font-body [&_code]:text-primary [&_code]:bg-muted [&_code]:px-1 [&_code]:rounded [&_img]:rounded-lg [&_img]:border [&_img]:border-primary/20 [&_img]:my-2 [&_img]:max-w-full">
+                  <ReactMarkdown
+                    components={{
+                      img: ({ node, ...props }) => (
+                        <img {...props} loading="lazy" alt={props.alt || "Generated image"} />
+                      ),
+                    }}
+                  >{msg.content}</ReactMarkdown>
                 </div>
               ) : (
-                <p className="text-xs sm:text-sm font-body">{msg.content}</p>
+                <p className="text-xs sm:text-sm font-body whitespace-pre-wrap">{msg.content}</p>
               )}
             </div>
           </motion.div>
