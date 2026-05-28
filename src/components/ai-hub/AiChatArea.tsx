@@ -135,6 +135,10 @@ export const AiChatArea = ({ mode, onProcessingChange }: Props) => {
   const sendMessage = useCallback(async (overrideInput?: string) => {
     const text = overrideInput ?? input;
     if (!text.trim() || isLoading) return;
+    const trimmed = text.trim();
+    if (trimmed.toLowerCase().startsWith("/image ")) {
+      return generateImage(trimmed.slice(7));
+    }
     const convId = await ensureConversation();
     if (!convId) return;
 
