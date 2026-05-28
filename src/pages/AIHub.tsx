@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Orbit, Menu, X, Brain } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { type AiMode } from "@/lib/streamChat";
@@ -7,6 +7,7 @@ import { CommandStatusBar } from "@/components/ai-hub/CommandStatusBar";
 import { LeftControlModules } from "@/components/ai-hub/LeftControlModules";
 import { RightIntelPanel } from "@/components/ai-hub/RightIntelPanel";
 import { MonitoringHeroWidget } from "@/components/ai-hub/MonitoringHeroWidget";
+import { ASICore } from "@/components/ai-hub/ASICore";
 import { MODE_CONFIG } from "@/components/ai-hub/modeConfig";
 
 const AIHub = () => {
@@ -14,7 +15,13 @@ const AIHub = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [confidence, setConfidence] = useState(92);
+  const [draft, setDraft] = useState("");
+  const [injectedInput, setInjectedInput] = useState<{ value: string; nonce: number } | null>(null);
   const cfg = MODE_CONFIG[mode];
+
+  const injectSuggestion = useCallback((p: string) => {
+    setInjectedInput({ value: p, nonce: Date.now() });
+  }, []);
 
   // Simulate confidence changes
   useEffect(() => {
@@ -81,6 +88,14 @@ const AIHub = () => {
       {/* Live Monitoring Hero */}
       <MonitoringHeroWidget />
 
+      {/* ASI Superintelligence Layer */}
+      <ASICore
+        mode={mode}
+        onModeChange={setMode}
+        isProcessing={isProcessing}
+        draft={draft}
+        onUseSuggestion={injectSuggestion}
+      />
 
       {/* Main 3-Column Layout */}
       <div className="flex-1 flex overflow-hidden relative">
@@ -114,7 +129,12 @@ const AIHub = () => {
         </div>
 
         {/* Central AI Core */}
-        <AiChatArea mode={mode} onProcessingChange={setIsProcessing} />
+        <AiChatArea
+          mode={mode}
+          onProcessingChange={setIsProcessing}
+          onDraftChange={setDraft}
+          injectedInput={injectedInput}
+        />
 
         {/* Desktop Right Intel Panel */}
         <div className="hidden xl:block">
