@@ -145,14 +145,13 @@ export const AICommandOS = ({ mode, onModeChange }: Props) => {
                 className="absolute inset-0 rounded-full border border-primary/15"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 60, repeat: Infinity, ease: "linear" }}
-              >
-                {[...Array(24)].map((_, i) => (
-                  <span key={i}
-                    className="absolute top-0 left-1/2 -translate-x-1/2 w-px h-3 bg-primary/30"
-                    style={{ transform: `rotate(${i*15}deg) translateY(-1px)`, transformOrigin: "50% 50vw" }}
-                  />
-                ))}
-              </motion.div>
+              />
+              <motion.div
+                className="absolute inset-[3%] rounded-full border border-dashed border-primary/10"
+                animate={{ rotate: -360 }}
+                transition={{ duration: 90, repeat: Infinity, ease: "linear" }}
+              />
+
 
               {/* Mid pulse ring */}
               <motion.div
