@@ -19,7 +19,7 @@ interface Props {
   mode: AiMode;
   onProcessingChange?: (v: boolean) => void;
   onDraftChange?: (v: string) => void;
-  injectedInput?: { value: string; nonce: number } | null;
+  injectedInput?: { value: string; nonce: number; autoSubmit?: boolean } | null;
 }
 
 const DEMO_SCRIPTS: Record<AiMode, string[]> = {
