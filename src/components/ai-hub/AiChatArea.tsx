@@ -19,7 +19,7 @@ interface Props {
   mode: AiMode;
   onProcessingChange?: (v: boolean) => void;
   onDraftChange?: (v: string) => void;
-  injectedInput?: { value: string; nonce: number } | null;
+  injectedInput?: { value: string; nonce: number; autoSubmit?: boolean } | null;
 }
 
 const DEMO_SCRIPTS: Record<AiMode, string[]> = {
@@ -63,9 +63,15 @@ export const AiChatArea = ({ mode, onProcessingChange, onDraftChange, injectedIn
   useEffect(() => {
     if (injectedInput && injectedInput.nonce !== lastInjectedNonceRef.current) {
       lastInjectedNonceRef.current = injectedInput.nonce;
-      setInput(injectedInput.value);
+      if (injectedInput.autoSubmit && injectedInput.value.trim()) {
+        sendMessageRef.current?.(injectedInput.value);
+      } else {
+        setInput(injectedInput.value);
+      }
     }
   }, [injectedInput]);
+
+  const sendMessageRef = useRef<((t?: string) => void) | null>(null);
 
   useEffect(() => {
     if (store.activeConvId && store.activeConvId !== prevConvIdRef.current) {
@@ -207,6 +213,8 @@ export const AiChatArea = ({ mode, onProcessingChange, onDraftChange, injectedIn
       });
     } catch { setIsLoading(false); onProcessingChange?.(false); }
   }, [input, isLoading, messages, mode, user, autoSpeak, voice, store]);
+
+  sendMessageRef.current = sendMessage;
 
   const handleVoiceResult = useCallback((text: string) => {
     if (text.trim()) sendMessage(text.trim());
