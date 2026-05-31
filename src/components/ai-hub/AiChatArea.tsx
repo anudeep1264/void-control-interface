@@ -214,6 +214,8 @@ export const AiChatArea = ({ mode, onProcessingChange, onDraftChange, injectedIn
     } catch { setIsLoading(false); onProcessingChange?.(false); }
   }, [input, isLoading, messages, mode, user, autoSpeak, voice, store]);
 
+  sendMessageRef.current = sendMessage;
+
   const handleVoiceResult = useCallback((text: string) => {
     if (text.trim()) sendMessage(text.trim());
   }, [sendMessage]);
