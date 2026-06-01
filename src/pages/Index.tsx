@@ -3,7 +3,7 @@ import MatrixRain from "@/components/MatrixRain";
 import CyberSidebar from "@/components/CyberSidebar";
 import Dashboard from "@/components/Dashboard";
 import Landing from "@/pages/Landing";
-import AIHub from "@/pages/AIHub";
+import VladOS from "@/pages/VladOS";
 import History from "@/pages/History";
 import Subscriptions from "@/pages/Subscriptions";
 import Account from "@/pages/Account";
@@ -26,7 +26,7 @@ const Index = () => {
       <CyberSidebar />
       <Routes>
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/ai-hub" element={<AIHub />} />
+        <Route path="/ai-hub" element={<VladOS />} />
         <Route path="/monitor" element={<Monitor />} />
         <Route path="/history" element={<History />} />
         <Route path="/subscriptions" element={<Subscriptions />} />

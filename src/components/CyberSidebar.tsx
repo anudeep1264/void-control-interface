@@ -20,7 +20,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const navItems = [
   { icon: Home, label: "Command", path: "/dashboard" },
-  { icon: Brain, label: "AI Hub", path: "/ai-hub" },
+  { icon: Brain, label: "VLAD Ω", path: "/ai-hub" },
   { icon: Activity, label: "Monitor", path: "/monitor" },
   { icon: Clock, label: "History", path: "/history" },
   { icon: CreditCard, label: "Subscriptions", path: "/subscriptions" },
