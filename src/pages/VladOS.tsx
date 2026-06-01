@@ -83,7 +83,7 @@ const VladOS = () => {
 
   const renderWorkspace = () => {
     if (workspace === "home")  return <HomeWorkspace />;
-    if (workspace === "image") return <ImageWorkspace initialPrompt={imagePrompt?.split(" · ")[0]} />;
+    if (workspace === "image") return <ImageWorkspace key={imagePrompt ?? "blank"} initialPrompt={imagePrompt?.split(" · ")[0]} />;
     return <SimWorkspace id={workspace as any} />;
   };
 
