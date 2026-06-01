@@ -19,7 +19,7 @@ const INSIGHTS = [
 ];
 
 export const HomeWorkspace = () => {
-  const metrics = useMonitoringStream();
+  const { latest } = useMonitoringStream(false);
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 p-4">
@@ -44,10 +44,10 @@ export const HomeWorkspace = () => {
 
       <Panel title="SYSTEM AWARENESS" icon={Activity}>
         <div className="grid grid-cols-2 gap-2 text-[11px] font-mono-tech">
-          <Metric label="CPU"  value={`${metrics.cpu}%`} />
-          <Metric label="MEM"  value={`${metrics.memPct}%`} />
-          <Metric label="NET" value={`${metrics.netDown}↓`} />
-          <Metric label="SEC"  value={metrics.threatLevel.toUpperCase()} />
+          <Metric label="CPU" value={`${Math.round(latest.cpu)}%`} />
+          <Metric label="MEM" value={`${Math.round(latest.mem_pct)}%`} />
+          <Metric label="NET" value={`${latest.net_down.toFixed(1)}↓`} />
+          <Metric label="SEC" value={latest.threat_level.toUpperCase()} />
         </div>
       </Panel>
 
