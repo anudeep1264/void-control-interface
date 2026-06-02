@@ -1,4 +1,25 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
+
+// Schema for the full upstream image-generation response (OpenAI + Gemini, normalized by Gateway).
+// We accept either b64_json or url on at least one data item; everything else is passthrough.
+const ImageDataItemSchema = z
+  .object({
+    b64_json: z.string().min(100).optional(),
+    url: z.string().url().startsWith("http").optional(),
+    revised_prompt: z.string().optional(),
+  })
+  .refine((d) => !!d.b64_json || !!d.url, {
+    message: "data item must contain b64_json or url",
+  });
+
+const ImageResponseSchema = z.object({
+  created: z.number().optional(),
+  data: z.array(ImageDataItemSchema).min(1),
+  usage: z.unknown().optional(),
+  model: z.string().optional(),
+});
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -51,25 +72,36 @@ serve(async (req) => {
         if (response.status === 429 || response.status === 402) break;
         continue;
       }
-      const data = await response.json();
+      const raw = await response.json();
 
-      // Validate response contains actual image data (b64_json or a URL)
-      const b64: string | undefined = data?.data?.[0]?.b64_json;
-      const url: string | undefined = data?.data?.[0]?.url;
+      // Validate full upstream response shape before extracting fields.
+      const parsed = ImageResponseSchema.safeParse(raw);
+      if (!parsed.success) {
+        console.error(
+          "Invalid upstream response schema",
+          model,
+          JSON.stringify(parsed.error.flatten()),
+          JSON.stringify(raw).slice(0, 500),
+        );
+        continue;
+      }
 
-      if (b64 && b64.length > 100) {
-        return new Response(JSON.stringify({ image_url: `data:image/png;base64,${b64}`, model }), {
+      const item = parsed.data.data[0];
+      if (item.b64_json) {
+        return new Response(
+          JSON.stringify({ image_url: `data:image/png;base64,${item.b64_json}`, model }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      if (item.url) {
+        return new Response(JSON.stringify({ image_url: item.url, model }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (url && typeof url === "string" && url.startsWith("http")) {
-        return new Response(JSON.stringify({ image_url: url, model }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
 
-      console.error("No valid image in response", model, JSON.stringify(data).slice(0, 500));
+      console.error("Validated response had no usable image", model);
     }
+
 
     if (lastErrStatus === 429) {
       return new Response(JSON.stringify({ error: "Rate limit exceeded. Try again shortly." }), {
