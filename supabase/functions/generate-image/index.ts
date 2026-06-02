@@ -72,25 +72,36 @@ serve(async (req) => {
         if (response.status === 429 || response.status === 402) break;
         continue;
       }
-      const data = await response.json();
+      const raw = await response.json();
 
-      // Validate response contains actual image data (b64_json or a URL)
-      const b64: string | undefined = data?.data?.[0]?.b64_json;
-      const url: string | undefined = data?.data?.[0]?.url;
+      // Validate full upstream response shape before extracting fields.
+      const parsed = ImageResponseSchema.safeParse(raw);
+      if (!parsed.success) {
+        console.error(
+          "Invalid upstream response schema",
+          model,
+          JSON.stringify(parsed.error.flatten()),
+          JSON.stringify(raw).slice(0, 500),
+        );
+        continue;
+      }
 
-      if (b64 && b64.length > 100) {
-        return new Response(JSON.stringify({ image_url: `data:image/png;base64,${b64}`, model }), {
+      const item = parsed.data.data[0];
+      if (item.b64_json) {
+        return new Response(
+          JSON.stringify({ image_url: `data:image/png;base64,${item.b64_json}`, model }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      if (item.url) {
+        return new Response(JSON.stringify({ image_url: item.url, model }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (url && typeof url === "string" && url.startsWith("http")) {
-        return new Response(JSON.stringify({ image_url: url, model }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
 
-      console.error("No valid image in response", model, JSON.stringify(data).slice(0, 500));
+      console.error("Validated response had no usable image", model);
     }
+
 
     if (lastErrStatus === 429) {
       return new Response(JSON.stringify({ error: "Rate limit exceeded. Try again shortly." }), {
