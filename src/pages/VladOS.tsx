@@ -184,4 +184,10 @@ const VladOSInner = () => {
   );
 };
 
+const VladOS = () => (
+  <ConversationProvider>
+    <VladOSInner />
+  </ConversationProvider>
+);
+
 export default VladOS;
