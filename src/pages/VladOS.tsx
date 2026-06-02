@@ -71,8 +71,17 @@ const VladOSInner = () => {
     try {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       const { data, error } = await supabase.functions.invoke("elevenlabs-token");
-      if (error || !data?.token) throw new Error(data?.error || error?.message || "Token unavailable");
-      await conversation.startSession({ conversationToken: data.token, connectionType: "webrtc" });
+      if (error) throw new Error(error.message || "Token unavailable");
+      if (data?.token) {
+        await conversation.startSession({ conversationToken: data.token, connectionType: "webrtc" });
+      } else if (data?.agentId) {
+        if (data?.warning) {
+          toast({ title: "Voice fallback active", description: data.warning });
+        }
+        await conversation.startSession({ agentId: data.agentId, connectionType: "webrtc" });
+      } else {
+        throw new Error(data?.error || "Token unavailable");
+      }
     } catch (e) {
       toast({ title: "Could not start VLAD", description: e instanceof Error ? e.message : "Unknown", variant: "destructive" });
     } finally { setConnecting(false); }
