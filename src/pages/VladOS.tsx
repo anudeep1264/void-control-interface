@@ -23,7 +23,7 @@ const WORKSPACES: { id: WorkspaceId; label: string; icon: any }[] = [
   { id: "code", label: "Dev", icon: Code2 },
 ];
 
-const VladOS = () => {
+const VladOSInner = () => {
   const [workspace, setWorkspace] = useState<WorkspaceId>("home");
   const [imagePrompt, setImagePrompt] = useState<string | undefined>();
   const [transcript, setTranscript] = useState<{ role: string; text: string }[]>([]);
