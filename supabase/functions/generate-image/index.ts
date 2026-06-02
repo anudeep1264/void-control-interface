@@ -1,4 +1,25 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { z } from "https://deno.land/x/zod@v3.23.8/mod.ts";
+
+// Schema for the full upstream image-generation response (OpenAI + Gemini, normalized by Gateway).
+// We accept either b64_json or url on at least one data item; everything else is passthrough.
+const ImageDataItemSchema = z
+  .object({
+    b64_json: z.string().min(100).optional(),
+    url: z.string().url().startsWith("http").optional(),
+    revised_prompt: z.string().optional(),
+  })
+  .refine((d) => !!d.b64_json || !!d.url, {
+    message: "data item must contain b64_json or url",
+  });
+
+const ImageResponseSchema = z.object({
+  created: z.number().optional(),
+  data: z.array(ImageDataItemSchema).min(1),
+  usage: z.unknown().optional(),
+  model: z.string().optional(),
+});
+
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
