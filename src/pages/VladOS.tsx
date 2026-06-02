@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useConversation } from "@elevenlabs/react";
+import { useConversation, ConversationProvider } from "@elevenlabs/react";
 import { Mic, MicOff, Home, ImageIcon, Mail, Calendar, FileText, Video, Music, BookOpen, Users, Code2, AlertCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -23,7 +23,7 @@ const WORKSPACES: { id: WorkspaceId; label: string; icon: any }[] = [
   { id: "code", label: "Dev", icon: Code2 },
 ];
 
-const VladOS = () => {
+const VladOSInner = () => {
   const [workspace, setWorkspace] = useState<WorkspaceId>("home");
   const [imagePrompt, setImagePrompt] = useState<string | undefined>();
   const [transcript, setTranscript] = useState<{ role: string; text: string }[]>([]);
@@ -183,5 +183,11 @@ const VladOS = () => {
     </div>
   );
 };
+
+const VladOS = () => (
+  <ConversationProvider>
+    <VladOSInner />
+  </ConversationProvider>
+);
 
 export default VladOS;
