@@ -52,13 +52,23 @@ serve(async (req) => {
         continue;
       }
       const data = await response.json();
+
+      // Validate response contains actual image data (b64_json or a URL)
       const b64: string | undefined = data?.data?.[0]?.b64_json;
-      if (b64) {
+      const url: string | undefined = data?.data?.[0]?.url;
+
+      if (b64 && b64.length > 100) {
         return new Response(JSON.stringify({ image_url: `data:image/png;base64,${b64}`, model }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      console.error("No image in response", model, JSON.stringify(data).slice(0, 500));
+      if (url && typeof url === "string" && url.startsWith("http")) {
+        return new Response(JSON.stringify({ image_url: url, model }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      console.error("No valid image in response", model, JSON.stringify(data).slice(0, 500));
     }
 
     if (lastErrStatus === 429) {
