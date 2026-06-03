@@ -1,10 +1,25 @@
 import { motion } from "framer-motion";
-import { Mail, Calendar, FileText, Video, Music, BookOpen, Users, Code2, LucideIcon } from "lucide-react";
+import { Mail, Calendar, FileText, Video, Music, BookOpen, Users, Code2, Globe, Workflow, LucideIcon } from "lucide-react";
 import type { WorkspaceId } from "./types";
 
 interface Block { title: string; meta?: string; body?: string; }
 
 const CONTENT: Record<Exclude<WorkspaceId, "home" | "image">, { icon: LucideIcon; label: string; blocks: Block[] }> = {
+  research: {
+    icon: Globe, label: "RESEARCH WORKSPACE",
+    blocks: [
+      { title: "Active inquiry", meta: "web · multi-source", body: "Synthesizing answer from top sources…" },
+      { title: "Saved briefs", meta: "12 documents", body: "Auto-summarized and tagged" },
+    ],
+  },
+  automation: {
+    icon: Workflow, label: "AUTOMATION CENTER",
+    blocks: [
+      { title: "Morning briefing", meta: "daily · 08:00", body: "Email digest + calendar + weather" },
+      { title: "Standup recap", meta: "weekdays · 10:00", body: "Auto-post summary to channel" },
+      { title: "Inbox triage", meta: "every 30m", body: "Classify, draft replies, flag urgent" },
+    ],
+  },
   email: {
     icon: Mail, label: "EMAIL WORKSPACE",
     blocks: [

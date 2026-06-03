@@ -1,7 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useConversation, ConversationProvider } from "@elevenlabs/react";
-import { Mic, MicOff, Home, ImageIcon, Mail, Calendar, FileText, Video, Music, BookOpen, Users, Code2, AlertCircle } from "lucide-react";
+import { Mic, MicOff, Home, ImageIcon, Mail, Calendar, FileText, Video, Music, BookOpen, Users, Code2, Globe, Workflow } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { IntelligenceCore, type CoreState } from "@/components/vlados/IntelligenceCore";
@@ -18,6 +18,8 @@ const WORKSPACES: { id: WorkspaceId; label: string; icon: any }[] = [
   { id: "files", label: "Files", icon: FileText },
   { id: "meetings", label: "Meetings", icon: Video },
   { id: "media", label: "Media", icon: Music },
+  { id: "research", label: "Research", icon: Globe },
+  { id: "automation", label: "Auto", icon: Workflow },
   { id: "memory", label: "Memory", icon: BookOpen },
   { id: "agents", label: "Agents", icon: Users },
   { id: "code", label: "Dev", icon: Code2 },
@@ -26,44 +28,67 @@ const WORKSPACES: { id: WorkspaceId; label: string; icon: any }[] = [
 const VladOSInner = () => {
   const [workspace, setWorkspace] = useState<WorkspaceId>("home");
   const [imagePrompt, setImagePrompt] = useState<string | undefined>();
-  const [transcript, setTranscript] = useState<{ role: string; text: string }[]>([]);
   const [connecting, setConnecting] = useState(false);
   const [coreState, setCoreState] = useState<CoreState>("standby");
-  const wasConnectedRef = useRef(false);
+  const [lastSaid, setLastSaid] = useState<string>("");
+  const [lastHeard, setLastHeard] = useState<string>("");
+  const historyRef = useRef<{ role: string; content: string }[]>([]);
+
+  const applyPlan = useCallback((plan: any) => {
+    if (!plan) return;
+    if (plan.workspace) setWorkspace(plan.workspace as WorkspaceId);
+    if (plan.action === "generate_image" && plan.payload) {
+      setWorkspace("image");
+      setImagePrompt(plan.payload + " · " + Date.now());
+    }
+    if (plan.say) setLastSaid(plan.say);
+  }, []);
+
+  const routeUtterance = useCallback(async (text: string) => {
+    setLastHeard(text);
+    setCoreState("thinking");
+    historyRef.current = [...historyRef.current.slice(-10), { role: "user", content: text }];
+    try {
+      const { data, error } = await supabase.functions.invoke("vlad-core", {
+        body: { utterance: text, history: historyRef.current.slice(0, -1) },
+      });
+      if (error) throw error;
+      if (data?.plan) {
+        applyPlan(data.plan);
+        historyRef.current.push({ role: "assistant", content: data.plan.say || "" });
+        setCoreState("executing");
+        setTimeout(() => setCoreState("listening"), 600);
+        return;
+      }
+    } catch (e) {
+      console.warn("vlad-core fallback:", e);
+    }
+    // Local fallback
+    const intent = detectIntent(text);
+    if (intent) {
+      setWorkspace(intent.workspace);
+      if (intent.workspace === "image" && intent.payload) setImagePrompt(intent.payload + " · " + Date.now());
+    }
+    setCoreState("listening");
+  }, [applyPlan]);
 
   const conversation = useConversation({
-    onConnect: () => { wasConnectedRef.current = true; setCoreState("listening"); },
-    onDisconnect: () => { setCoreState("standby"); },
+    onConnect: () => setCoreState("listening"),
+    onDisconnect: () => setCoreState("standby"),
     onError: (e: any) => {
       toast({ title: "Voice error", description: String(e?.message || e), variant: "destructive" });
       setCoreState("standby");
     },
     onMessage: (m: any) => {
-      const type = m?.type ?? m?.source ?? "";
-      // User finalized utterance
       const userText = m?.user_transcription_event?.user_transcript || (m?.source === "user" ? m?.message : null);
-      const agentText = m?.agent_response_event?.agent_response || (m?.source === "ai" ? m?.message : null);
-
-      if (userText) {
-        setTranscript(t => [...t.slice(-20), { role: "user", text: userText }]);
-        setCoreState("thinking");
-        const intent = detectIntent(userText);
-        if (intent) {
-          setCoreState("executing");
-          setWorkspace(intent.workspace);
-          if (intent.workspace === "image" && intent.payload) setImagePrompt(intent.payload + " · " + Date.now());
-        }
-      }
-      if (agentText) {
-        setTranscript(t => [...t.slice(-20), { role: "agent", text: agentText }]);
-      }
+      if (userText) routeUtterance(userText);
     },
   });
 
-  // Sync isSpeaking with core state
   useEffect(() => {
     if (conversation.status !== "connected") return;
-    setCoreState(conversation.isSpeaking ? "speaking" : "listening");
+    setCoreState(prev => (prev === "thinking" || prev === "executing") ? prev
+      : (conversation.isSpeaking ? "speaking" : "listening"));
   }, [conversation.isSpeaking, conversation.status]);
 
   const start = useCallback(async () => {
@@ -75,9 +100,7 @@ const VladOSInner = () => {
       if (data?.token) {
         await conversation.startSession({ conversationToken: data.token, connectionType: "webrtc" });
       } else if (data?.agentId) {
-        if (data?.warning) {
-          toast({ title: "Voice fallback active", description: data.warning });
-        }
+        if (data?.warning) toast({ title: "Voice fallback active", description: data.warning });
         await conversation.startSession({ agentId: data.agentId, connectionType: "webrtc" });
       } else {
         throw new Error(data?.error || "Token unavailable");
@@ -100,11 +123,9 @@ const VladOSInner = () => {
     <div className="flex-1 flex flex-col h-full overflow-hidden relative">
       {/* Header */}
       <div className="px-4 py-3 border-b border-border/40 flex items-center justify-between gap-3 bg-card/30 backdrop-blur-sm">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex flex-col">
-            <h1 className="font-display text-base sm:text-lg text-primary tracking-[0.3em] text-glow-blue">VLAD Ω</h1>
-            <p className="text-[9px] font-mono-tech text-muted-foreground tracking-[0.3em]">AUTONOMOUS PERSONAL INTELLIGENCE</p>
-          </div>
+        <div className="flex flex-col">
+          <h1 className="font-display text-base sm:text-lg text-primary tracking-[0.3em] text-glow-blue">VLAD Ω</h1>
+          <p className="text-[9px] font-mono-tech text-muted-foreground tracking-[0.3em]">PERSONAL INTELLIGENCE OS</p>
         </div>
         <button
           onClick={connected ? stop : start}
@@ -134,60 +155,36 @@ const VladOSInner = () => {
         })}
       </div>
 
-      {/* Body */}
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_320px] overflow-hidden">
-        <div className="overflow-y-auto custom-scrollbar relative">
-          {/* Floating intelligence core when not on home */}
-          {workspace !== "home" && (
-            <div className="absolute top-4 right-4 z-20 hidden md:block">
-              <IntelligenceCore state={coreState} size={120} />
-            </div>
-          )}
-          {workspace === "home" && (
-            <div className="flex flex-col items-center justify-center pt-8 pb-4">
-              <IntelligenceCore state={coreState} size={200} />
-              <p className="mt-10 text-[10px] font-mono-tech text-muted-foreground tracking-[0.4em]">
-                {connected ? "SPEAK NATURALLY · VLAD IS LISTENING" : "ACTIVATE TO BEGIN"}
-              </p>
-            </div>
-          )}
-          <AnimatePresence mode="wait">
-            <motion.div key={workspace} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
-              {renderWorkspace()}
-            </motion.div>
-          </AnimatePresence>
-        </div>
-
-        {/* Voice transcript / state rail */}
-        <aside className="hidden lg:flex flex-col border-l border-border/40 bg-card/20 backdrop-blur-sm">
-          <div className="px-3 py-2 border-b border-border/40 flex items-center gap-2">
-            <span className={`w-1.5 h-1.5 rounded-full ${connected ? "bg-accent animate-pulse" : "bg-muted-foreground/40"}`} />
-            <h3 className="font-mono-tech text-[10px] tracking-[0.3em] text-primary">VOICE STREAM</h3>
+      {/* Pure voice-first body */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar relative">
+        {workspace !== "home" && (
+          <div className="absolute top-4 right-4 z-20 hidden md:block">
+            <IntelligenceCore state={coreState} size={120} />
           </div>
-          <div className="flex-1 overflow-y-auto custom-scrollbar p-3 space-y-2">
-            {transcript.length === 0 && (
-              <div className="flex flex-col items-center gap-2 text-muted-foreground/50 pt-8">
-                <AlertCircle className="w-5 h-5" />
-                <p className="text-[10px] font-mono-tech tracking-[0.2em] text-center">
-                  No voice activity yet.<br/>Try: "Create an image of a neon city"
+        )}
+        {workspace === "home" && (
+          <div className="flex flex-col items-center justify-center pt-8 pb-2">
+            <IntelligenceCore state={coreState} size={200} />
+            <div className="mt-10 min-h-[44px] max-w-md text-center px-4">
+              {lastSaid ? (
+                <motion.p key={lastSaid} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }}
+                  className="text-sm text-foreground/90 font-body italic">"{lastSaid}"</motion.p>
+              ) : (
+                <p className="text-[10px] font-mono-tech text-muted-foreground tracking-[0.4em]">
+                  {connected ? "SPEAK NATURALLY · VLAD IS LISTENING" : "ACTIVATE TO BEGIN"}
                 </p>
-              </div>
-            )}
-            {transcript.map((t, i) => (
-              <motion.div key={i} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }}
-                className={`rounded-lg px-2.5 py-2 text-xs border ${
-                  t.role === "user"
-                    ? "border-secondary/30 bg-secondary/5 text-foreground"
-                    : "border-primary/25 bg-primary/5 text-foreground"
-                }`}>
-                <p className="text-[9px] font-mono-tech tracking-[0.3em] mb-0.5 opacity-60">
-                  {t.role === "user" ? "YOU" : "VLAD"}
-                </p>
-                <p className="leading-snug">{t.text}</p>
-              </motion.div>
-            ))}
+              )}
+              {lastHeard && (
+                <p className="mt-2 text-[10px] font-mono-tech text-secondary/70 tracking-[0.2em]">↳ {lastHeard}</p>
+              )}
+            </div>
           </div>
-        </aside>
+        )}
+        <AnimatePresence mode="wait">
+          <motion.div key={workspace} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }}>
+            {renderWorkspace()}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
