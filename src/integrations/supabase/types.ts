@@ -310,6 +310,42 @@ export type Database = {
         }
         Relationships: []
       }
+      vlad_memories: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          importance: number
+          kind: string
+          source: string
+          tags: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          importance?: number
+          kind?: string
+          source?: string
+          tags?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          importance?: number
+          kind?: string
+          source?: string
+          tags?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
