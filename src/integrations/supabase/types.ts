@@ -283,6 +283,195 @@ export type Database = {
         }
         Relationships: []
       }
+      soc_alerts: {
+        Row: {
+          created_at: string
+          detail: string | null
+          evidence: Json
+          id: string
+          recommended_action: string | null
+          risk_score: number
+          session_id: string | null
+          severity: string
+          state: string
+          threat_type: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          detail?: string | null
+          evidence?: Json
+          id?: string
+          recommended_action?: string | null
+          risk_score: number
+          session_id?: string | null
+          severity: string
+          state?: string
+          threat_type: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          detail?: string | null
+          evidence?: Json
+          id?: string
+          recommended_action?: string | null
+          risk_score?: number
+          session_id?: string | null
+          severity?: string
+          state?: string
+          threat_type?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "soc_alerts_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "soc_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      soc_events: {
+        Row: {
+          created_at: string
+          evidence: Json
+          id: string
+          kind: string
+          score: number
+          session_id: string | null
+          severity: string
+          source: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          evidence?: Json
+          id?: string
+          kind: string
+          score?: number
+          session_id?: string | null
+          severity?: string
+          source?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          evidence?: Json
+          id?: string
+          kind?: string
+          score?: number
+          session_id?: string | null
+          severity?: string
+          source?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "soc_events_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "soc_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      soc_frames: {
+        Row: {
+          captured_at: string
+          detections: Json
+          id: string
+          ocr_confidence: number | null
+          ocr_text: string | null
+          phash: string | null
+          risk: number
+          session_id: string | null
+          storage_path: string | null
+          thumb_data_url: string | null
+          user_id: string
+        }
+        Insert: {
+          captured_at?: string
+          detections?: Json
+          id?: string
+          ocr_confidence?: number | null
+          ocr_text?: string | null
+          phash?: string | null
+          risk?: number
+          session_id?: string | null
+          storage_path?: string | null
+          thumb_data_url?: string | null
+          user_id: string
+        }
+        Update: {
+          captured_at?: string
+          detections?: Json
+          id?: string
+          ocr_confidence?: number | null
+          ocr_text?: string | null
+          phash?: string | null
+          risk?: number
+          session_id?: string | null
+          storage_path?: string | null
+          thumb_data_url?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "soc_frames_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "soc_sessions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      soc_sessions: {
+        Row: {
+          alerts_count: number
+          capture_source: string | null
+          created_at: string
+          ended_at: string | null
+          frames_count: number
+          id: string
+          max_risk: number
+          notes: string | null
+          started_at: string
+          user_id: string
+        }
+        Insert: {
+          alerts_count?: number
+          capture_source?: string | null
+          created_at?: string
+          ended_at?: string | null
+          frames_count?: number
+          id?: string
+          max_risk?: number
+          notes?: string | null
+          started_at?: string
+          user_id: string
+        }
+        Update: {
+          alerts_count?: number
+          capture_source?: string | null
+          created_at?: string
+          ended_at?: string | null
+          frames_count?: number
+          id?: string
+          max_risk?: number
+          notes?: string | null
+          started_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_settings: {
         Row: {
           created_at: string
