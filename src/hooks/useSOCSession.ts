@@ -147,16 +147,16 @@ export function useSOCSession() {
 
       const { data: frameRow } = await supabase
         .from("soc_frames")
-        .insert({
+        .insert([{
           user_id: user.id,
-          session_id: sessionId,
+          session_id: sessionId ?? undefined,
           thumb_data_url: frame.thumbDataUrl,
           phash: hash,
           ocr_text: text.slice(0, 8000),
           ocr_confidence: Math.round(conf * 100) / 100,
-          detections: secretHits.slice(0, 30),
+          detections: secretHits.slice(0, 30) as never,
           risk: frameRisk,
-        })
+        }])
         .select()
         .single();
       if (frameRow) setFrames((p) => [frameRow as SOCFrameRow, ...p].slice(0, 30));

@@ -30,7 +30,7 @@ export function useScreenCapture(intervalMs = 2500) {
   const start = useCallback(async () => {
     setError(null);
     try {
-      const md = navigator.mediaDevices as MediaDevicesWithGDM;
+      const md = navigator.mediaDevices as MediaDevices & { getDisplayMedia?: (c?: DisplayMediaStreamOptions) => Promise<MediaStream> };
       if (!md.getDisplayMedia) throw new Error("Screen capture not supported in this browser.");
       const stream = await md.getDisplayMedia({ video: { frameRate: 4 }, audio: false });
       streamRef.current = stream;
