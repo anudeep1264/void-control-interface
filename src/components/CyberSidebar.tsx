@@ -15,6 +15,7 @@ import {
   LogOut,
   Radio,
   Activity,
+  ShieldAlert,
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -22,6 +23,7 @@ const navItems = [
   { icon: Home, label: "Command", path: "/dashboard" },
   { icon: Brain, label: "VLAD Ω", path: "/ai-hub" },
   { icon: Activity, label: "Monitor", path: "/monitor" },
+  { icon: ShieldAlert, label: "SOC", path: "/soc" },
   { icon: Clock, label: "History", path: "/history" },
   { icon: CreditCard, label: "Subscriptions", path: "/subscriptions" },
   { icon: User, label: "Account", path: "/account" },

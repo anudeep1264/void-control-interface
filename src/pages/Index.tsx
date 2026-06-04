@@ -10,6 +10,7 @@ import Account from "@/pages/Account";
 import SecurityLogs from "@/pages/SecurityLogs";
 import SettingsPage from "@/pages/Settings";
 import Monitor from "@/pages/Monitor";
+import SOC from "@/pages/SOC";
 
 const Index = () => {
   const location = useLocation();
@@ -28,6 +29,7 @@ const Index = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/ai-hub" element={<VladOS />} />
         <Route path="/monitor" element={<Monitor />} />
+        <Route path="/soc" element={<SOC />} />
         <Route path="/history" element={<History />} />
         <Route path="/subscriptions" element={<Subscriptions />} />
         <Route path="/account" element={<Account />} />
