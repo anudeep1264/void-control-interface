@@ -10,9 +10,6 @@ interface DisplayMediaStreamOptions {
   video?: MediaTrackConstraints | boolean;
   audio?: boolean;
 }
-interface MediaDevicesWithGDM extends MediaDevices {
-  getDisplayMedia?: (constraints?: DisplayMediaStreamOptions) => Promise<MediaStream>;
-}
 
 export function useScreenCapture(intervalMs = 2500) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
