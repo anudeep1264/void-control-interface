@@ -1,5 +1,4 @@
 import { Routes, Route, useLocation } from "react-router-dom";
-import MatrixRain from "@/components/MatrixRain";
 import CyberSidebar from "@/components/CyberSidebar";
 import Dashboard from "@/components/Dashboard";
 import Landing from "@/pages/Landing";
@@ -14,28 +13,24 @@ import SOC from "@/pages/SOC";
 
 const Index = () => {
   const location = useLocation();
-  const isLanding = location.pathname === "/";
-
-  if (isLanding) {
-    return <Landing />;
-  }
+  if (location.pathname === "/") return <Landing />;
 
   return (
-    <div className="flex h-screen overflow-hidden relative">
-      <MatrixRain />
-      <div className="fixed inset-0 scanline pointer-events-none z-[1]" />
+    <div className="min-h-dvh bg-background lg:flex paper-texture">
       <CyberSidebar />
-      <Routes>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/ai-hub" element={<VladOS />} />
-        <Route path="/monitor" element={<Monitor />} />
-        <Route path="/soc" element={<SOC />} />
-        <Route path="/history" element={<History />} />
-        <Route path="/subscriptions" element={<Subscriptions />} />
-        <Route path="/account" element={<Account />} />
-        <Route path="/security-logs" element={<SecurityLogs />} />
-        <Route path="/settings" element={<SettingsPage />} />
-      </Routes>
+      <main className="min-w-0 flex-1 pb-20 lg:pb-0 lg:h-dvh lg:overflow-hidden">
+        <Routes>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/ai-hub" element={<VladOS />} />
+          <Route path="/monitor" element={<Monitor />} />
+          <Route path="/soc" element={<SOC />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/subscriptions" element={<Subscriptions />} />
+          <Route path="/account" element={<Account />} />
+          <Route path="/security-logs" element={<SecurityLogs />} />
+          <Route path="/settings" element={<SettingsPage />} />
+        </Routes>
+      </main>
     </div>
   );
 };
