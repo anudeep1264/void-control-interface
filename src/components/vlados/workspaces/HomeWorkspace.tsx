@@ -1,96 +1,32 @@
-import { motion } from "framer-motion";
-import { Activity, Brain, Cloud, Mail, Calendar, Music, FileText, Github, Slack, Zap } from "lucide-react";
+import { Activity, BookOpen, Link2, ShieldCheck } from "lucide-react";
 import { useMonitoringStream } from "@/hooks/useMonitoringStream";
-
-const SERVICES = [
-  { icon: Mail, label: "Gmail", status: "online" },
-  { icon: Calendar, label: "Calendar", status: "online" },
-  { icon: Cloud, label: "Drive", status: "online" },
-  { icon: Music, label: "Spotify", status: "idle" },
-  { icon: Github, label: "GitHub", status: "online" },
-  { icon: Slack, label: "Slack", status: "idle" },
-];
-
-const INSIGHTS = [
-  "3 unread priority emails detected",
-  "Meeting in 42 min — Daily Standup",
-  "Energy peak window: 14:00–16:00",
-  "2 deadlines approaching this week",
-];
 
 export const HomeWorkspace = () => {
   const { latest } = useMonitoringStream(false);
+  const metrics = [
+    { label: "CPU", value: Number.isFinite(latest.cpu) ? `${Math.round(latest.cpu)}%` : "Data unavailable" },
+    { label: "Memory", value: Number.isFinite(latest.mem_pct) ? `${Math.round(latest.mem_pct)}%` : "Data unavailable" },
+    { label: "Network", value: Number.isFinite(latest.net_down) ? `${latest.net_down.toFixed(1)} down` : "Data unavailable" },
+    { label: "Security", value: latest.threat_level ? latest.threat_level : "Data unavailable" },
+  ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 p-4">
-      <Panel title="ACTIVE TASKS" icon={Zap}>
-        <ul className="space-y-2 text-xs font-mono-tech">
-          {["Summarize today's emails", "Prepare standup notes", "Track GitHub PR #482"].map((t, i) => (
-            <li key={i} className="flex items-center gap-2 text-foreground/80">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" /> {t}
-            </li>
-          ))}
-        </ul>
-      </Panel>
-
-      <Panel title="DAILY INSIGHTS" icon={Brain}>
-        <ul className="space-y-2 text-xs font-body">
-          {INSIGHTS.map((t, i) => (
-            <motion.li key={i} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.08 }}
-              className="text-muted-foreground border-l-2 border-secondary/40 pl-2">{t}</motion.li>
-          ))}
-        </ul>
-      </Panel>
-
-      <Panel title="SYSTEM AWARENESS" icon={Activity}>
-        <div className="grid grid-cols-2 gap-2 text-[11px] font-mono-tech">
-          <Metric label="CPU" value={`${Math.round(latest.cpu)}%`} />
-          <Metric label="MEM" value={`${Math.round(latest.mem_pct)}%`} />
-          <Metric label="NET" value={`${latest.net_down.toFixed(1)}↓`} />
-          <Metric label="SEC" value={latest.threat_level.toUpperCase()} />
+    <div className="columns-1 gap-4 px-4 pb-8 sm:columns-2 xl:columns-3 sm:px-6">
+      <section className="mb-4 break-inside-avoid rounded-md border bg-card p-5">
+        <Activity className="mb-8 h-5 w-5 text-accent" /><small className="uppercase text-muted-foreground">System awareness</small>
+        <div className="mt-4 grid grid-cols-2 gap-px overflow-hidden rounded-md border bg-border">
+          {metrics.map((metric) => <div key={metric.label} className="bg-card p-3"><small className="block text-muted-foreground">{metric.label}</small><strong className="mt-1 block capitalize">{metric.value}</strong></div>)}
         </div>
-      </Panel>
-
-      <Panel title="CONNECTED SERVICES" icon={Cloud} className="md:col-span-2">
-        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-          {SERVICES.map(s => (
-            <div key={s.label} className="flex flex-col items-center gap-1 p-2 rounded-lg border border-border/40 bg-muted/20">
-              <s.icon className={`w-4 h-4 ${s.status === "online" ? "text-accent" : "text-muted-foreground"}`} />
-              <span className="text-[9px] font-mono-tech text-muted-foreground tracking-wider">{s.label}</span>
-              <span className={`w-1 h-1 rounded-full ${s.status === "online" ? "bg-accent" : "bg-muted-foreground/40"}`} />
-            </div>
-          ))}
-        </div>
-      </Panel>
-
-      <Panel title="MEMORY STATUS" icon={FileText}>
-        <div className="space-y-2 text-[11px] font-mono-tech text-muted-foreground">
-          <Row k="Conversations" v="247" />
-          <Row k="Preferences"   v="38 learned" />
-          <Row k="Contacts"      v="156" />
-          <Row k="Context Recall" v="OPTIMAL" />
-        </div>
-      </Panel>
+      </section>
+      <section className="mb-4 break-inside-avoid rounded-md bg-primary p-5 text-primary-foreground">
+        <BookOpen className="mb-12 h-5 w-5" /><small className="uppercase opacity-70">Memory</small><h3 className="mt-2 text-2xl">Context is recalled only when you ask.</h3><p className="mt-3 text-sm leading-6 opacity-70">Your long-term memory stays scoped to your signed-in account.</p>
+      </section>
+      <section className="mb-4 break-inside-avoid rounded-md border bg-card p-5">
+        <Link2 className="mb-8 h-5 w-5 text-primary" /><small className="uppercase text-muted-foreground">Connected services</small><h3 className="mt-2 text-xl">No service status available.</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Availability appears here after a supported integration is connected.</p>
+      </section>
+      <section className="mb-4 break-inside-avoid rounded-md border bg-muted p-5">
+        <ShieldCheck className="mb-8 h-5 w-5 text-primary" /><small className="uppercase text-muted-foreground">Privacy</small><h3 className="mt-2 text-xl">Per-user data boundaries</h3><p className="mt-3 text-sm leading-6 text-muted-foreground">Assistant memories and operational records remain isolated by account.</p>
+      </section>
     </div>
   );
 };
-
-const Panel = ({ title, icon: Icon, children, className = "" }: any) => (
-  <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-    className={`holo-card border border-border/40 rounded-xl p-3 ${className}`}>
-    <div className="flex items-center gap-2 mb-2">
-      <Icon className="w-3.5 h-3.5 text-primary" />
-      <h3 className="font-mono-tech text-[10px] tracking-[0.3em] text-primary">{title}</h3>
-    </div>
-    {children}
-  </motion.div>
-);
-const Metric = ({ label, value }: any) => (
-  <div className="rounded-md border border-border/40 bg-background/40 p-2">
-    <div className="text-[9px] text-muted-foreground">{label}</div>
-    <div className="text-sm text-foreground">{value}</div>
-  </div>
-);
-const Row = ({ k, v }: any) => (
-  <div className="flex justify-between"><span>{k}</span><span className="text-foreground">{v}</span></div>
-);
